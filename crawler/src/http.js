@@ -19,7 +19,21 @@ function randomUserAgent() {
 
 export const client = axios.create({ timeout: 15000 });
 client.interceptors.request.use((config) => {
-  config.headers = { ...config.headers, 'User-Agent': randomUserAgent() };
+  const url = new URL(config.url);
+  config.headers = {
+    ...config.headers,
+    'User-Agent': randomUserAgent(),
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Language': 'es-MX,es;q=0.9,en;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sec-Fetch-User': '?1',
+    'Referer': `${url.protocol}//${url.host}/`,
+  };
   return config;
 });
 
