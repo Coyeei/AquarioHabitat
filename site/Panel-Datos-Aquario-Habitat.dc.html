@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/styles.css">
+  <script src="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/_ds_bundle.js"></script>
+  <script src="./image-slot.js"></script>
+  <style>
+    :root {
+      --color-accent: var(--color-text); --color-accent-100: var(--color-neutral-100); --color-accent-200: var(--color-neutral-200); --color-accent-300: var(--color-neutral-300);
+      --color-accent-600: #000; --color-accent-700: var(--color-text); --color-accent-800: var(--color-neutral-800);
+      --color-accent-2-100: var(--color-neutral-100); --color-accent-2-800: var(--color-neutral-800);
+    }
+    :root[data-theme="dark"] {
+      --color-bg: #121212; --color-surface: #1c1c1c; --color-text: #f2f0ef; --color-divider: rgba(255,255,255,0.18);
+      --color-neutral-100: #242424; --color-neutral-200: #2e2e2e; --color-neutral-300: #3a3a3a;
+      --color-neutral-600: #a3a3a3; --color-neutral-700: #c4c4c4; --color-neutral-800: #e0e0e0; --color-neutral-900: #f5f5f5;
+      --color-accent-600: #fff;
+    }
+    html, body { margin: 0; height: 100%; background: var(--color-bg); }
+    * { box-sizing: border-box; }
+    .nav-item { cursor:pointer; user-select:none; }
+    @keyframes pulseDot { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .status-dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+    .status-dot.live { background:#2f9e44; animation:pulseDot 1.6s ease-in-out infinite; }
+    .status-dot.idle { background:#f0a500; }
+    .status-dot.error { background:#e03131; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: var(--color-neutral-300); }
+  </style>
+</helmet>
+
+<div style="font-family: var(--font-body); color: var(--color-text); height:100vh; display:flex; flex-direction:column;" lang="es">
+
+  <!-- TOP NAV -->
+  <div style="flex:none; height:64px; border-bottom:2px solid var(--color-divider); display:flex; align-items:center; justify-content:space-between; padding:0 24px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <img src="./assets/logo-aquario-habitat.png" alt="Aquario Habitat" style="height:26px; width:26px; object-fit:contain;">
+      <div style="font-family:var(--font-heading); font-weight:800; font-size:13px; letter-spacing:0.03em;">AQUARIO HABITAT <span style="opacity:0.5; font-weight:600;">· PANEL DE DATOS</span></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <sc-if value="{{ isAdmin }}">
+        <button class="btn btn-primary" onClick="{{ openForm }}">+ Agregar propiedad</button>
+      </sc-if>
+      <sc-if value="{{ isAsesor }}">
+        <button class="btn btn-primary" onClick="{{ openForm }}">+ Registrar propiedad en campo</button>
+      </sc-if>
+      <div style="display:flex; border:1px solid var(--color-divider);">
+        <div onClick="{{ setRoleAdmin }}" style="padding:5px 10px; font-size:11px; cursor:pointer; font-weight:{{ adminWeight }};" style-hover="background:var(--color-neutral-100);">Admin</div>
+        <div onClick="{{ setRoleAsesor }}" style="padding:5px 10px; font-size:11px; cursor:pointer; border-left:1px solid var(--color-divider); font-weight:{{ asesorWeight }};" style-hover="background:var(--color-neutral-100);">Asesor</div>
+      </div>
+      <div onClick="{{ toggleTheme }}" title="{{ themeLabel }}" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid var(--color-divider); color:var(--color-text); transition:border-color 0.15s ease;" style-hover="border-color:var(--color-text);">
+        <sc-if value="{{ dark }}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+        </sc-if>
+        <sc-if value="{{ notDark }}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </sc-if>
+      </div>
+      <a href="Login-Aquario-Habitat.dc.html" style="font-size:11.5px; padding:6px 12px; text-decoration:none; color:var(--color-text); border:1px solid var(--color-divider); font-family:var(--font-heading); font-weight:700;" style-hover="border-color:var(--color-text);">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div style="flex:1; min-height:0; display:flex;">
+
+    <!-- SIDEBAR -->
+    <div style="width:200px; flex:none; border-right:2px solid var(--color-divider); padding:20px 0;">
+      <a href="Dashboard-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Propiedades</a>
+      <div class="nav-item" style="padding:10px 20px; font-size:13.5px; font-weight:700; border-left:3px solid var(--color-accent);">Fuentes</div>
+      <a href="Alertas-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Alertas</a>
+      <a href="Perfil-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Perfil</a>
+    <a href="Usuarios-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Usuarios</a>
+    </div>
+
+    <!-- MAIN -->
+    <div style="flex:1; min-width:0; overflow-y:auto; padding:28px 32px;">
+
+      <!-- SOURCE STATUS ROW -->
+      <sc-if value="{{ isAdmin }}">
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--color-divider); border:1px solid var(--color-divider); margin-bottom:32px;">
+        <div style="background:var(--color-bg); padding:16px;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:6px;">Manual</div>
+          <div style="font-size:12px; color:var(--color-neutral-600); margin-bottom:10px;">Captura directa del equipo</div>
+          <div class="tag tag-outline" style="font-size:10px;">Confianza alta</div>
+        </div>
+        <div style="background:var(--color-bg); padding:16px;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:6px;">Inmuebles24</div>
+          <div style="font-size:12px; color:var(--color-neutral-600); margin-bottom:10px; display:flex; align-items:center; gap:6px;"><span class="status-dot live"></span>Activo · última corrida hace 22 min</div>
+          <div class="tag tag-outline" style="font-size:10px;">Confianza alta</div>
+        </div>
+        <div style="background:var(--color-bg); padding:16px;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:6px;">Vivanuncios</div>
+          <div style="font-size:12px; color:var(--color-neutral-600); margin-bottom:10px; display:flex; align-items:center; gap:6px;"><span class="status-dot live"></span>Activo · última corrida hace 40 min</div>
+          <div class="tag tag-outline" style="font-size:10px;">Confianza media</div>
+        </div>
+        <div style="background:var(--color-bg); padding:16px;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:6px;">Lamudi</div>
+          <div style="font-size:12px; color:var(--color-neutral-600); margin-bottom:10px; display:flex; align-items:center; gap:6px;"><span class="status-dot idle"></span>En validación · aún sin corrida continua</div>
+          <div class="tag tag-outline" style="font-size:10px;">Confianza baja</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- TABLE -->
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:18px;">{{ count }} propiedades</div>
+        <div style="display:flex; gap:8px;">
+          <sc-if value="{{ isAdmin }}">
+          <sc-for list="{{ sourceFilters }}" as="sf" hint-placeholder-count="5">
+            <div class="tag seg-tag {{ sf.tagClass }}" onClick="{{ sf.onClick }}" style="cursor:pointer;">{{ sf.name }}</div>
+          </sc-for>
+          </sc-if>
+          <sc-if value="{{ isAsesor }}">
+            <div class="tag tag-neutral">Mis registros</div>
+          </sc-if>
+        </div>
+      </div>
+
+      <table class="table" style="width:100%;">
+        <thead>
+          <tr>
+            <th>Propiedad</th>
+            <th>Segmento</th>
+            <th>Precio</th>
+            <th>m²</th>
+            <th>Fuente</th>
+            <th>Confianza</th>
+            <th>Actualizado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ properties }}" as="p" hint-placeholder-count="6">
+            <tr>
+              <td style="font-weight:700;">{{ p.title }}</td>
+              <td>{{ p.segment }}</td>
+              <td>{{ p.price }}</td>
+              <td>{{ p.size }}</td>
+              <td><span class="tag {{ p.sourceTagClass }}" style="font-size:10.5px;">{{ p.source }}</span></td>
+              <td>{{ p.confidence }}</td>
+              <td style="color:var(--color-neutral-600);">{{ p.updated }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+      <sc-if value="{{ isEmpty }}">
+        <div style="padding:64px 20px; text-align:center; border:1px solid var(--color-divider); border-top:none;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-400)" stroke-width="1.5" style="margin:0 auto 12px;"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:4px;">Aún no hay propiedades de esta fuente</div>
+          <div style="font-size:12.5px; color:var(--color-neutral-600);">El crawler corre cada 15–30 min; los nuevos resultados aparecerán aquí automáticamente.</div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <!-- MANUAL ENTRY SLIDE-OVER -->
+  <sc-if value="{{ formOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:30; display:flex; justify-content:flex-end;">
+      <div style="position:absolute; inset:0; background:rgba(0,0,0,0.4);" onClick="{{ closeForm }}"></div>
+      <div style="position:relative; width:440px; height:100%; background:var(--color-bg); border-left:2px solid var(--color-divider); display:flex; flex-direction:column;">
+        <div style="flex:none; padding:20px 24px; border-bottom:2px solid var(--color-divider); display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:16px;">Agregar propiedad manualmente</div>
+          <div class="btn btn-ghost" onClick="{{ closeForm }}" style="padding:4px 10px;">✕</div>
+        </div>
+        <div style="flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:16px;">
+          <div class="field">
+            <label>Título</label>
+            <input class="input" type="text" placeholder="Ej. Casa en Lomas de San Luis">
+          </div>
+          <div class="field">
+            <label>Segmento</label>
+            <select class="input" value="{{ formSegment }}" onChange="{{ onSegmentChange }}">
+              <option>Residencial</option>
+              <option>Comercial</option>
+              <option>Industrial</option>
+              <option>Terrenos</option>
+              <option>Ranchos</option>
+              <option>Desarrollos</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Dirección / colonia</label>
+            <input class="input" type="text" placeholder="Ej. Lomas de San Luis, SLP">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="field">
+              <label>Precio (MXN)</label>
+              <input class="input" type="text" placeholder="$2,400,000">
+            </div>
+            <div class="field">
+              <label>{{ sizeLabel }}</label>
+              <input class="input" type="text" placeholder="{{ sizePlaceholder }}">
+            </div>
+          </div>
+
+          <sc-if value="{{ isResidencial }}">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="field">
+                <label>Recámaras</label>
+                <input class="input" type="text" placeholder="3">
+              </div>
+              <div class="field">
+                <label>Baños</label>
+                <input class="input" type="text" placeholder="2">
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isComercial }}">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="field">
+                <label>Cap rate estimado (%)</label>
+                <input class="input" type="text" placeholder="7.5">
+              </div>
+              <div class="field">
+                <label>NOI mensual estimado</label>
+                <input class="input" type="text" placeholder="$45,000">
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isIndustrial }}">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="field">
+                <label>Altura libre (m)</label>
+                <input class="input" type="text" placeholder="10">
+              </div>
+              <div class="field">
+                <label>Dock doors</label>
+                <input class="input" type="text" placeholder="4">
+              </div>
+            </div>
+            <div class="field">
+              <label>Potencia eléctrica disponible (kVA)</label>
+              <input class="input" type="text" placeholder="500">
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isTerreno }}">
+            <div class="field">
+              <label>Uso de suelo</label>
+              <select class="input">
+                <option>Habitacional</option>
+                <option>Comercial</option>
+                <option>Industrial</option>
+                <option>Agrícola</option>
+                <option>Mixto</option>
+              </select>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="field">
+                <label>Topografía</label>
+                <select class="input">
+                  <option>Plano</option>
+                  <option>Inclinado</option>
+                  <option>Mixto</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Acceso a agua</label>
+                <select class="input">
+                  <option>Sí</option>
+                  <option>No</option>
+                </select>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isRancho }}">
+            <div class="field">
+              <label>Vocación</label>
+              <select class="input">
+                <option>Agrícola</option>
+                <option>Ganadera</option>
+                <option>Forestal</option>
+                <option>Caza</option>
+              </select>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="field">
+                <label>Cuerpos de agua</label>
+                <select class="input">
+                  <option>Sí</option>
+                  <option>No</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Construcciones existentes</label>
+                <input class="input" type="text" placeholder="Ej. casco, bodega">
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isDesarrollo }}">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="field">
+                <label>Número de lotes / unidades</label>
+                <input class="input" type="text" placeholder="48">
+              </div>
+              <div class="field">
+                <label>Avance de obra (%)</label>
+                <input class="input" type="text" placeholder="35">
+              </div>
+            </div>
+            <div class="field">
+              <label>Uso de suelo autorizado</label>
+              <input class="input" type="text" placeholder="Ej. habitacional mixto">
+            </div>
+          </sc-if>
+
+          <div class="field">
+            <label>Fotografías</label>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
+              <image-slot id="manual-photo-1" shape="rect" placeholder="Foto 1" style="width:100%; aspect-ratio:1;"></image-slot>
+              <image-slot id="manual-photo-2" shape="rect" placeholder="Foto 2" style="width:100%; aspect-ratio:1;"></image-slot>
+              <image-slot id="manual-photo-3" shape="rect" placeholder="Foto 3" style="width:100%; aspect-ratio:1;"></image-slot>
+              <image-slot id="manual-photo-4" shape="rect" placeholder="Foto 4" style="width:100%; aspect-ratio:1;"></image-slot>
+              <image-slot id="manual-photo-5" shape="rect" placeholder="Foto 5" style="width:100%; aspect-ratio:1;"></image-slot>
+              <image-slot id="manual-photo-6" shape="rect" placeholder="Foto 6" style="width:100%; aspect-ratio:1;"></image-slot>
+              <image-slot id="manual-photo-7" shape="rect" placeholder="Foto 7" style="width:100%; aspect-ratio:1;"></image-slot>
+              <image-slot id="manual-photo-8" shape="rect" placeholder="Foto 8" style="width:100%; aspect-ratio:1;"></image-slot>
+              <image-slot id="manual-photo-9" shape="rect" placeholder="Foto 9" style="width:100%; aspect-ratio:1;"></image-slot>
+              <image-slot id="manual-photo-10" shape="rect" placeholder="Foto 10" style="width:100%; aspect-ratio:1;"></image-slot>
+            </div>
+            <div style="font-size:11.5px; color:var(--color-neutral-600); margin-top:6px;">Hasta 10 fotos, JPG o PNG. La primera foto se usa como portada en el mapa y la lista.</div>
+          </div>
+
+          <div class="field">
+            <label>Contacto del propietario</label>
+            <input class="input" type="text" placeholder="Nombre del propietario" style="margin-bottom:8px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <input class="input" type="text" placeholder="Teléfono">
+              <input class="input" type="email" placeholder="Correo">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Notas / fuente del dato</label>
+            <input class="input" type="text" placeholder="Ej. visita directa, asesor de campo">
+          </div>
+        </div>
+        <div style="flex:none; padding:20px 24px; border-top:2px solid var(--color-divider); display:flex; gap:12px;">
+          <button class="btn btn-secondary" onClick="{{ closeForm }}" style="flex:1;">Cancelar</button>
+          <button class="btn btn-primary" onClick="{{ closeForm }}" style="flex:1;">Guardar propiedad</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { activeSource: 'Todas', formOpen: false, formSegment: 'Residencial', dark: false, role: 'admin' };
+
+  setRole(role) { localStorage.setItem('ah-role', role); this.setState({ role }); }
+
+  componentDidMount() {
+    const saved = localStorage.getItem('ah-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    const role = localStorage.getItem('ah-role') || 'admin';
+    this.setState({ dark: saved === 'dark', role });
+  }
+
+  toggleTheme() {
+    const next = this.state.dark ? 'light' : 'dark';
+    localStorage.setItem('ah-theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+    this.setState({ dark: next === 'dark' });
+  }
+
+  allProperties = [
+    { title: 'Casa en Lomas de San Luis', segment: 'Residencial', size: '220 m²', price: '$2.4M', source: 'Manual', confidence: 'Alta', updated: 'Hoy, 09:12' },
+    { title: 'Local comercial en Centro', segment: 'Comercial', size: '140 m²', price: '$3.1M', source: 'Inmuebles24', confidence: 'Alta', updated: 'Hace 22 min' },
+    { title: 'Terreno en Zona Industrial', segment: 'Industrial', size: '5,200 m²', price: '$5.6M', source: 'Vivanuncios', confidence: 'Media', updated: 'Hace 40 min' },
+    { title: 'Depto en Valle Dorado', segment: 'Residencial', size: '95 m²', price: '$1.8M', source: 'Inmuebles24', confidence: 'Alta', updated: 'Hace 1 h' },
+    { title: 'Rancho en Villa de Reyes', segment: 'Ranchos', size: '4.2 ha', price: '$4.0M', source: 'Manual', confidence: 'Alta', updated: 'Ayer' },
+    { title: 'Terreno en Zona Industrial 2', segment: 'Terrenos', size: '3,000 m²', price: '$2.9M', source: 'Lamudi', confidence: 'Baja', updated: 'Hace 3 h' },
+    { title: 'Desarrollo Los Encinos', segment: 'Desarrollos', size: '48 lotes', price: '$18.2M', source: 'Vivanuncios', confidence: 'Media', updated: 'Hace 2 h' }
+  ];
+
+  sourceTagClass(source) {
+    if (source === 'Manual') return 'tag-neutral';
+    if (source === 'Lamudi') return 'tag-outline';
+    return 'tag-accent';
+  }
+
+  setSource(name) { this.setState({ activeSource: name }); }
+  openForm() { this.setState({ formOpen: true }); }
+  closeForm() { this.setState({ formOpen: false }); }
+  setFormSegment(e) { this.setState({ formSegment: e.target.value }); }
+
+  renderVals() {
+    const names = ['Todas', 'Manual', 'Inmuebles24', 'Vivanuncios', 'Lamudi'];
+    const active = this.state.activeSource;
+    const sourceFilters = names.map(name => ({
+      name,
+      tagClass: name === active ? 'tag-accent' : 'tag-outline',
+      onClick: () => this.setSource(name)
+    }));
+    const properties = (active === 'Todas' ? this.allProperties : this.allProperties.filter(p => p.source === active))
+      .map(p => ({ ...p, sourceTagClass: this.sourceTagClass(p.source) }));
+
+    const seg = this.state.formSegment;
+    const sizeLabel = seg === 'Ranchos' ? 'Superficie (ha)' : seg === 'Desarrollos' ? 'Superficie total (m²)' : 'Superficie (m²)';
+    const sizePlaceholder = seg === 'Ranchos' ? '4.2' : seg === 'Terrenos' ? '3000' : '220';
+
+    return {
+      sourceFilters,
+      properties,
+      count: properties.length,
+      isEmpty: properties.length === 0,
+      formOpen: this.state.formOpen,
+      openForm: () => this.openForm(),
+      closeForm: () => this.closeForm(),
+      formSegment: seg,
+      onSegmentChange: (e) => this.setFormSegment(e),
+      sizeLabel,
+      sizePlaceholder,
+      isResidencial: seg === 'Residencial',
+      isComercial: seg === 'Comercial',
+      isIndustrial: seg === 'Industrial',
+      isTerreno: seg === 'Terrenos',
+      isRancho: seg === 'Ranchos',
+      isDesarrollo: seg === 'Desarrollos',
+      themeLabel: this.state.dark ? 'Modo claro' : 'Modo oscuro',
+      dark: this.state.dark,
+      notDark: !this.state.dark,
+      toggleTheme: () => this.toggleTheme(),
+      isAdmin: this.state.role === 'admin',
+      isAsesor: this.state.role === 'asesor',
+      adminWeight: this.state.role === 'admin' ? 800 : 400,
+      asesorWeight: this.state.role === 'asesor' ? 800 : 400,
+      setRoleAdmin: () => this.setRole('admin'),
+      setRoleAsesor: () => this.setRole('asesor')
+    };
+  }
+}
+</script>
+</body>
+</html>

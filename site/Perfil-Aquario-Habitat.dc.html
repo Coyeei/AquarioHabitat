@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/styles.css">
+  <script src="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/_ds_bundle.js"></script>
+  <style>
+    :root {
+      --color-accent: var(--color-text); --color-accent-100: var(--color-neutral-100); --color-accent-200: var(--color-neutral-200); --color-accent-300: var(--color-neutral-300);
+      --color-accent-600: #000; --color-accent-700: var(--color-text); --color-accent-800: var(--color-neutral-800);
+      --color-accent-2-100: var(--color-neutral-100); --color-accent-2-800: var(--color-neutral-800);
+    }
+    :root[data-theme="dark"] {
+      --color-bg: #121212; --color-surface: #1c1c1c; --color-text: #f2f0ef; --color-divider: rgba(255,255,255,0.18);
+      --color-neutral-100: #242424; --color-neutral-200: #2e2e2e; --color-neutral-300: #3a3a3a;
+      --color-neutral-600: #a3a3a3; --color-neutral-700: #c4c4c4; --color-neutral-800: #e0e0e0; --color-neutral-900: #f5f5f5;
+      --color-accent-600: #fff;
+    }
+    html, body { margin: 0; height: 100%; background: var(--color-bg); }
+    * { box-sizing: border-box; }
+    .nav-item { cursor:pointer; user-select:none; }
+    .toggle { width:36px; height:20px; border:2px solid var(--color-divider); position:relative; cursor:pointer; flex:none; }
+    .toggle-dot { position:absolute; top:1px; width:14px; height:14px; background:var(--color-text); transition:left 0.15s ease; }
+  </style>
+</helmet>
+
+<div style="font-family: var(--font-body); color: var(--color-text); height:100vh; display:flex; flex-direction:column;" lang="es">
+
+  <!-- TOP NAV -->
+  <div style="flex:none; height:64px; border-bottom:2px solid var(--color-divider); display:flex; align-items:center; justify-content:space-between; padding:0 24px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <img src="./assets/logo-aquario-habitat.png" alt="Aquario Habitat" style="height:26px; width:26px; object-fit:contain;">
+      <div style="font-family:var(--font-heading); font-weight:800; font-size:13px; letter-spacing:0.03em;">AQUARIO HABITAT <span style="opacity:0.5; font-weight:600;">· PERFIL</span></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="display:flex; border:1px solid var(--color-divider);">
+        <div onClick="{{ setRoleAdmin }}" style="padding:5px 10px; font-size:11px; cursor:pointer; font-weight:{{ adminWeight }};" style-hover="background:var(--color-neutral-100);">Admin</div>
+        <div onClick="{{ setRoleAsesor }}" style="padding:5px 10px; font-size:11px; cursor:pointer; border-left:1px solid var(--color-divider); font-weight:{{ asesorWeight }};" style-hover="background:var(--color-neutral-100);">Asesor</div>
+      </div>
+      <div onClick="{{ toggleTheme }}" title="{{ themeLabel }}" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid var(--color-divider); color:var(--color-text); transition:border-color 0.15s ease;" style-hover="border-color:var(--color-text);">
+        <sc-if value="{{ dark }}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+        </sc-if>
+        <sc-if value="{{ notDark }}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </sc-if>
+      </div>
+      <a href="Login-Aquario-Habitat.dc.html" style="font-size:11.5px; padding:6px 12px; text-decoration:none; color:var(--color-text); border:1px solid var(--color-divider); font-family:var(--font-heading); font-weight:700;" style-hover="border-color:var(--color-text);">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div style="flex:1; min-height:0; display:flex;">
+
+    <!-- SIDEBAR -->
+    <div style="width:200px; flex:none; border-right:2px solid var(--color-divider); padding:20px 0;">
+      <a href="Dashboard-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Propiedades</a>
+      <a href="Panel-Datos-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Fuentes</a>
+      <a href="Alertas-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Alertas</a>
+      <div class="nav-item" style="padding:10px 20px; font-size:13.5px; font-weight:700; border-left:3px solid var(--color-accent);">Perfil</div>
+    <a href="Usuarios-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Usuarios</a>
+    </div>
+
+    <!-- MAIN -->
+    <div style="flex:1; min-width:0; overflow-y:auto; padding:32px; display:flex; justify-content:center;">
+      <div style="width:100%; max-width:560px;">
+
+        <!-- IDENTITY -->
+        <div style="display:flex; align-items:center; gap:16px; padding-bottom:24px; border-bottom:2px solid var(--color-divider); margin-bottom:28px;">
+          <div style="width:64px; height:64px; border-radius:50%; background:var(--color-neutral-200); display:flex; align-items:center; justify-content:center; font-family:var(--font-heading); font-weight:800; font-size:20px; flex:none;">DS</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:var(--font-heading); font-weight:800; font-size:18px;">Daniel Sánchez Pineda</div>
+            <div style="font-size:13px; color:var(--color-neutral-600);">daniel.sanchez@aquariohabitat.com</div>
+          </div>
+          <div class="tag tag-outline" style="font-size:11px;">{{ roleLabel }}</div>
+        </div>
+
+        <!-- DATOS -->
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:14px;">Datos de la cuenta</div>
+        <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:32px;">
+          <div class="field">
+            <label>Nombre completo</label>
+            <input class="input" type="text" value="Daniel Sánchez Pineda" readonly="{{ isAsesor }}">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="field">
+              <label>Correo electrónico</label>
+              <input class="input" type="email" value="daniel.sanchez@aquariohabitat.com">
+            </div>
+            <div class="field">
+              <label>Teléfono</label>
+              <input class="input" type="text" value="+52 444 123 4567">
+            </div>
+          </div>
+          <div class="field">
+            <label>Zona de operación</label>
+            <input class="input" type="text" value="San Luis Potosí">
+          </div>
+        </div>
+
+        <!-- SEGURIDAD -->
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:14px;">Seguridad</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div class="field">
+            <label>Nueva contraseña</label>
+            <input class="input" type="password" placeholder="••••••••" value="{{ password }}" onChange="{{ onPasswordChange }}">
+          </div>
+          <div class="field">
+            <label>Confirmar contraseña</label>
+            <input class="input" type="password" placeholder="••••••••" value="{{ confirmPassword }}" onChange="{{ onConfirmChange }}">
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:32px; font-size:12px;">
+          <div style="color:{{ ruleLengthColor }}; font-weight:{{ ruleLengthWeight }};">Mínimo 12 caracteres</div>
+          <div style="color:{{ ruleUpperColor }}; font-weight:{{ ruleUpperWeight }};">Al menos una mayúscula</div>
+          <div style="color:{{ ruleNumberColor }}; font-weight:{{ ruleNumberWeight }};">Al menos un número</div>
+          <div style="color:{{ ruleSymbolColor }}; font-weight:{{ ruleSymbolWeight }};">Al menos un símbolo (!@#$%...)</div>
+          <div style="color:{{ ruleMatchColor }}; font-weight:{{ ruleMatchWeight }};">Ambas contraseñas coinciden</div>
+        </div>
+
+        <!-- NOTIFICACIONES -->
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:14px;">Preferencias de notificación</div>
+        <div style="display:flex; flex-direction:column; border:1px solid var(--color-divider); margin-bottom:32px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--color-divider);">
+            <div>
+              <div style="font-size:13.5px; font-weight:700;">Alertas en el panel</div>
+              <div style="font-size:12px; color:var(--color-neutral-600);">Notificaciones dentro de la plataforma</div>
+            </div>
+            <div class="toggle" style="{{ panelSwitchStyle }}" onClick="{{ togglePanel }}"><div class="toggle-dot" style="{{ panelDotStyle }}"></div></div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--color-divider);">
+            <div>
+              <div style="font-size:13.5px; font-weight:700;">Correo electrónico</div>
+              <div style="font-size:12px; color:var(--color-neutral-600);">Resumen y alertas por email</div>
+            </div>
+            <div class="toggle" style="{{ emailSwitchStyle }}" onClick="{{ toggleEmail }}"><div class="toggle-dot" style="{{ emailDotStyle }}"></div></div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px;">
+            <div>
+              <div style="font-size:13.5px; font-weight:700;">WhatsApp</div>
+              <div style="font-size:12px; color:var(--color-neutral-600);">Avisos urgentes por WhatsApp</div>
+            </div>
+            <div class="toggle" style="{{ waSwitchStyle }}" onClick="{{ toggleWa }}"><div class="toggle-dot" style="{{ waDotStyle }}"></div></div>
+          </div>
+        </div>
+
+        <!-- SITIO PÚBLICO -->
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:6px;">Sitio público</div>
+        <div style="font-size:12px; color:var(--color-neutral-600); margin-bottom:14px;">Banner de portada del sitio público. Solo administradores pueden cambiarlo.</div>
+        <div style="border:1px solid var(--color-divider); margin-bottom:32px;">
+          <div style="width:100%; aspect-ratio:16/6; background:var(--color-neutral-200); position:relative; overflow:hidden;">
+            <div style="{{ heroPreviewStyle }}"></div>
+            <sc-if value="{{ hasHeroImage }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--color-neutral-600); font-size:12px;">Sin banner — se muestra un marcador de posición</div>
+            </sc-if>
+          </div>
+          <div style="display:flex; gap:10px; padding:14px; align-items:center;">
+            <label class="btn btn-primary" style="cursor:pointer;" title="Recomendado: 1920 × 600 px, horizontal (16:5), JPG o WebP">Subir banner<input type="file" accept="image/*" onChange="{{ onHeroFileChange }}" style="display:none;"></label>
+            <sc-if value="{{ hasHeroImage }}">
+              <div class="btn btn-secondary" style="cursor:pointer;" onClick="{{ clearHeroImage }}">Quitar banner</div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+          <button class="btn btn-secondary" style="flex:1;">Cancelar</button>
+          <button class="btn btn-primary" style="flex:1;">Guardar cambios</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { dark: false, role: 'admin', notifPanel: true, notifEmail: true, notifWa: false, password: '', confirmPassword: '', heroImage: '' };
+
+  componentDidMount() {
+    const saved = localStorage.getItem('ah-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    const role = localStorage.getItem('ah-role') || 'admin';
+    const heroImage = localStorage.getItem('ah-site-hero') || '';
+    this.setState({ dark: saved === 'dark', role, heroImage });
+  }
+
+  onHeroFileChange(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      localStorage.setItem('ah-site-hero', reader.result);
+      window.dispatchEvent(new CustomEvent('ah-hero-changed'));
+      this.setState({ heroImage: reader.result });
+    };
+    reader.readAsDataURL(file);
+  }
+  clearHeroImage() {
+    localStorage.removeItem('ah-site-hero');
+    window.dispatchEvent(new CustomEvent('ah-hero-changed'));
+    this.setState({ heroImage: '' });
+  }
+
+  toggleTheme() {
+    const next = this.state.dark ? 'light' : 'dark';
+    localStorage.setItem('ah-theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+    this.setState({ dark: next === 'dark' });
+  }
+
+  setRole(role) { localStorage.setItem('ah-role', role); this.setState({ role }); }
+
+  toggleNotif(key) { this.setState(s => ({ [key]: !s[key] })); }
+
+  switchStyle(on) { return `background:${on ? 'var(--color-accent)' : 'var(--color-neutral-200)'};`; }
+  dotStyle(on) { return `left:${on ? '18px' : '2px'};`; }
+
+  ruleStyle(met) { return met ? 'var(--color-text)' : 'var(--color-neutral-500)'; }
+
+  renderVals() {
+    const pw = this.state.password;
+    const okLength = pw.length >= 12;
+    const okUpper = /[A-Z]/.test(pw);
+    const okNumber = /[0-9]/.test(pw);
+    const okSymbol = /[^A-Za-z0-9]/.test(pw);
+    const okMatch = pw.length > 0 && pw === this.state.confirmPassword;
+    return {
+      password: pw,
+      confirmPassword: this.state.confirmPassword,
+      onPasswordChange: (e) => this.setState({ password: e.target.value }),
+      onConfirmChange: (e) => this.setState({ confirmPassword: e.target.value }),
+      ruleLengthColor: this.ruleStyle(okLength), ruleLengthWeight: okLength ? 700 : 400,
+      ruleUpperColor: this.ruleStyle(okUpper), ruleUpperWeight: okUpper ? 700 : 400,
+      ruleNumberColor: this.ruleStyle(okNumber), ruleNumberWeight: okNumber ? 700 : 400,
+      ruleSymbolColor: this.ruleStyle(okSymbol), ruleSymbolWeight: okSymbol ? 700 : 400,
+      ruleMatchColor: this.ruleStyle(okMatch), ruleMatchWeight: okMatch ? 700 : 400,
+      dark: this.state.dark,
+      notDark: !this.state.dark,
+      themeLabel: this.state.dark ? 'Modo claro' : 'Modo oscuro',
+      toggleTheme: () => this.toggleTheme(),
+      isAdmin: this.state.role === 'admin',
+      isAsesor: this.state.role === 'asesor',
+      roleLabel: this.state.role === 'admin' ? 'Administrador' : 'Asesor de campo',
+      adminWeight: this.state.role === 'admin' ? 800 : 400,
+      asesorWeight: this.state.role === 'asesor' ? 800 : 400,
+      setRoleAdmin: () => this.setRole('admin'),
+      setRoleAsesor: () => this.setRole('asesor'),
+      panelSwitchStyle: this.switchStyle(this.state.notifPanel),
+      panelDotStyle: this.dotStyle(this.state.notifPanel),
+      emailSwitchStyle: this.switchStyle(this.state.notifEmail),
+      emailDotStyle: this.dotStyle(this.state.notifEmail),
+      waSwitchStyle: this.switchStyle(this.state.notifWa),
+      waDotStyle: this.dotStyle(this.state.notifWa),
+      togglePanel: () => this.toggleNotif('notifPanel'),
+      toggleEmail: () => this.toggleNotif('notifEmail'),
+      toggleWa: () => this.toggleNotif('notifWa'),
+      hasHeroImage: !!this.state.heroImage,
+      heroPreviewStyle: this.state.heroImage ? `position:absolute; inset:0; background-image:url("${this.state.heroImage}"); background-size:cover; background-position:center;` : 'display:none;',
+      onHeroFileChange: (e) => this.onHeroFileChange(e),
+      clearHeroImage: () => this.clearHeroImage()
+    };
+  }
+}
+
+</script>
+</body>
+</html>

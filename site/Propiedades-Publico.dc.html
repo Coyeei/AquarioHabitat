@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/styles.css">
+  <script src="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/_ds_bundle.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="./image-slot.js"></script>
+  <script src="./properties-store.js"></script>
+  <style>
+    .leaflet-container { background: var(--color-neutral-100); font-family: var(--font-body); }
+    .leaflet-control-attribution { font-size:10px; }
+    :root {
+      --color-accent: var(--color-text); --color-accent-100: var(--color-neutral-100); --color-accent-200: var(--color-neutral-200); --color-accent-300: var(--color-neutral-300);
+      --color-accent-600: #000; --color-accent-700: var(--color-text); --color-accent-800: var(--color-neutral-800);
+      --color-accent-2-100: var(--color-neutral-100); --color-accent-2-800: var(--color-neutral-800);
+    }
+    html, body { margin:0; height:100%; background:var(--color-bg); }
+    * { box-sizing:border-box; }
+    .pin { position:absolute; transform: translate(-50%,-100%); display:flex; flex-direction:column; align-items:center; cursor:pointer; }
+    .pin-badge { font-family: var(--font-heading); font-weight:800; font-size:11px; padding:4px 8px; white-space:nowrap; border:2px solid var(--color-text); background:var(--color-bg); }
+    .pin-badge.hi { background:var(--color-text); color:#fff; }
+    .pin-stem { width:2px; height:10px; background:var(--color-text); }
+    .card-row { cursor:pointer; }
+    .budget-range { -webkit-appearance:none; appearance:none; height:2px; }
+    .budget-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; pointer-events:auto; width:16px; height:16px; border-radius:50%; background:var(--color-bg); border:2px solid var(--color-text); cursor:pointer; }
+    .budget-range::-moz-range-thumb { pointer-events:auto; width:12px; height:12px; border-radius:50%; background:var(--color-bg); border:2px solid var(--color-text); cursor:pointer; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: var(--color-neutral-300); }
+  </style>
+</helmet>
+
+<div style="font-family: var(--font-body); color: var(--color-text); height:100vh; display:flex;" lang="es">
+
+  <!-- ICON SIDEBAR -->
+  <div style="flex:none; width:76px; height:100%; border-right:2px solid var(--color-divider); display:flex; flex-direction:column; align-items:center; gap:4px; padding:20px 0; overflow-y:auto;">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 8px; cursor:pointer; width:60px;" style-hover="background:var(--color-neutral-100);" onClick="{{ goToMapSearch }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      <div style="font-size:10px; font-weight:600;">Buscar</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 8px; cursor:pointer; width:60px;" style-hover="background:var(--color-neutral-100);" onClick="{{ openAlerts }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"></path></svg>
+      <div style="font-size:10px; font-weight:600;">Alertas</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 8px; cursor:pointer; width:60px;" style-hover="background:var(--color-neutral-100);" onClick="{{ openFavorites }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+      <div style="font-size:10px; font-weight:600;">Favoritos</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 8px; cursor:pointer; width:60px;" style-hover="background:var(--color-neutral-100);" onClick="{{ openSavedSearches }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path><path d="M9 11l2 2 4-4"></path></svg>
+      <div style="font-size:10px; font-weight:600;">Guardado</div>
+    </div>
+    <div style="position:relative; display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 8px; cursor:pointer; width:60px;" style-hover="background:var(--color-neutral-100);" onClick="{{ openInbox }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+      <div style="font-size:10px; font-weight:600;">Mensajes</div>
+      <sc-if value="{{ hasUnreadMessages }}">
+        <div style="position:absolute; top:6px; right:10px; background:var(--color-accent); color:#fff; font-size:9px; font-weight:800; width:14px; height:14px; border-radius:50%; display:flex; align-items:center; justify-content:center;">{{ unreadMessagesCount }}</div>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- MAIN COLUMN -->
+  <div style="flex:1; min-width:0; height:100%; display:flex; flex-direction:column;">
+
+  <!-- TOP NAV -->
+  <div style="flex:none; height:60px; border-bottom:2px solid var(--color-divider); display:flex; align-items:center; gap:10px; padding:0 20px;">
+    <div onClick="{{ goHome }}" style="display:flex; align-items:center; gap:8px; cursor:pointer; flex:none;">
+      <img src="./assets/logo-aquario-habitat.png" alt="Aquario Habitat" style="height:24px; width:24px; object-fit:contain;">
+    </div>
+    <sc-if value="{{ isResults }}">
+      <div style="flex:1; min-width:0; display:flex; align-items:center; gap:8px; overflow-x:auto; padding:2px 0;">
+      <div style="position:relative; flex:none; width:220px;">
+        <input class="input" type="text" placeholder="Dirección, colonia, ciudad, CP" value="{{ query }}" onChange="{{ onQueryChange }}" style="height:38px; font-size:12.5px; border-radius:19px; padding-right:32px; width:100%;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-600)" stroke-width="2" style="position:absolute; right:11px; top:50%; transform:translateY(-50%);"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      </div>
+
+      <div style="position:relative; flex:none;">
+        <div style="{{ dd.opBtnStyle }}" onClick="{{ toggleOpDD }}">{{ operationLabel }} <span>{{ dd.opChevron }}</span></div>
+        <sc-if value="{{ dd.opOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed; inset:0; z-index:900;" onClick="{{ closeDropdowns }}"></div>
+          <div style="position:fixed; top:{{ dd.top }}px; left:{{ dd.left }}px; width:180px; background:var(--color-bg); border:1px solid var(--color-divider); box-shadow:var(--shadow-md); z-index:950; padding:8px;">
+            <sc-for list="{{ operationOptions }}" as="o" hint-placeholder-count="2">
+              <div style="{{ o.rowStyle }}" onClick="{{ o.onClick }}">{{ o.label }}</div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="position:relative; flex:none;">
+        <div style="{{ dd.segmentBtnStyle }}" onClick="{{ toggleSegmentDD }}">Segmento <span>{{ dd.segmentChevron }}</span></div>
+        <sc-if value="{{ dd.segmentOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed; inset:0; z-index:900;" onClick="{{ closeDropdowns }}"></div>
+          <div style="position:fixed; top:{{ dd.top }}px; left:{{ dd.left }}px; width:220px; background:var(--color-bg); border:1px solid var(--color-divider); box-shadow:var(--shadow-md); z-index:950; padding:8px;">
+            <sc-for list="{{ segments }}" as="seg" hint-placeholder-count="7">
+              <div style="{{ seg.rowStyle }}" onClick="{{ seg.onClick }}">{{ seg.name }}</div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ showPropertyTypeFilter }}">
+      <div style="position:relative; flex:none;">
+        <div style="{{ dd.ptypeBtnStyle }}" onClick="{{ togglePtypeDD }}">Tipo <span>{{ dd.ptypeChevron }}</span></div>
+        <sc-if value="{{ dd.ptypeOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed; inset:0; z-index:900;" onClick="{{ closeDropdowns }}"></div>
+          <div style="position:fixed; top:{{ dd.top }}px; left:{{ dd.left }}px; width:220px; background:var(--color-bg); border:1px solid var(--color-divider); box-shadow:var(--shadow-md); z-index:950; padding:8px;">
+            <sc-for list="{{ propertyTypeOptions }}" as="pt" hint-placeholder-count="5">
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; padding:7px 8px; cursor:pointer;"><input type="checkbox" style="accent-color:var(--color-text);">{{ pt }}</label>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <div style="position:relative; flex:none;">
+        <div style="{{ dd.priceBtnStyle }}" onClick="{{ togglePriceDD }}">Precio <span>{{ dd.priceChevron }}</span></div>
+        <sc-if value="{{ dd.priceOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed; inset:0; z-index:900;" onClick="{{ closeDropdowns }}"></div>
+          <div style="position:fixed; top:{{ dd.top }}px; left:{{ dd.left }}px; width:300px; background:var(--color-bg); border:1px solid var(--color-divider); box-shadow:var(--shadow-md); z-index:950; padding:16px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--color-neutral-600); margin-bottom:12px;">Rango de precio</div>
+            <div style="display:flex; align-items:flex-end; gap:1px; height:33px;">
+              <sc-for list="{{ fPriceHistogram }}" as="bar" hint-placeholder-count="16">
+                <div style="flex:1; height:{{ bar.h }}px; {{ bar.style }}"></div>
+              </sc-for>
+            </div>
+            <div style="position:relative; height:20px; margin-top:4px;">
+              <div style="position:absolute; top:9px; left:0; right:0; height:2px; background:var(--color-neutral-300);"></div>
+              <div style="{{ fPriceFillStyle }} top:9px; height:2px;"></div>
+              <input class="budget-range" type="range" min="0" max="20" step="0.5" value="{{ fPriceMin }}" onChange="{{ onFPriceMinRange }}" style="position:absolute; inset:0; width:100%; margin:0; background:transparent; pointer-events:none;">
+              <input class="budget-range" type="range" min="0" max="20" step="0.5" value="{{ fPriceMax }}" onChange="{{ onFPriceMaxRange }}" style="position:absolute; inset:0; width:100%; margin:0; background:transparent; pointer-events:none;">
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--color-neutral-600); margin-bottom:14px;">
+              <span>{{ fPriceMinLabel }}</span>
+              <span>{{ fPriceMaxLabel }}</span>
+            </div>
+            <button class="btn btn-primary btn-block" onClick="{{ applyFPrice }}">Aplicar</button>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ showBedsFilter }}">
+      <div style="position:relative; flex:none;">
+        <div style="{{ dd.bedsBtnStyle }}" onClick="{{ toggleBedsDD }}">Recámaras <span>{{ dd.bedsChevron }}</span></div>
+        <sc-if value="{{ dd.bedsOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed; inset:0; z-index:900;" onClick="{{ closeDropdowns }}"></div>
+          <div style="position:fixed; top:{{ dd.top }}px; left:{{ dd.left }}px; width:300px; background:var(--color-bg); border:1px solid var(--color-divider); box-shadow:var(--shadow-md); z-index:950; padding:16px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--color-neutral-600); margin-bottom:10px;">Recámaras</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
+              <sc-for list="{{ bedOptions }}" as="b" hint-placeholder-count="6">
+                <div style="{{ b.style }}" onClick="{{ b.onClick }}">{{ b.label }}</div>
+              </sc-for>
+            </div>
+            <button class="btn btn-primary btn-block" onClick="{{ closeDropdowns }}">Aplicar</button>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="position:relative; flex:none;">
+        <div style="{{ dd.bathsBtnStyle }}" onClick="{{ toggleBathsDD }}">Baños <span>{{ dd.bathsChevron }}</span></div>
+        <sc-if value="{{ dd.bathsOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed; inset:0; z-index:900;" onClick="{{ closeDropdowns }}"></div>
+          <div style="position:fixed; top:{{ dd.top }}px; left:{{ dd.left }}px; width:300px; background:var(--color-bg); border:1px solid var(--color-divider); box-shadow:var(--shadow-md); z-index:950; padding:16px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--color-neutral-600); margin-bottom:10px;">Baños</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
+              <sc-for list="{{ bathOptions }}" as="b" hint-placeholder-count="5">
+                <div style="{{ b.style }}" onClick="{{ b.onClick }}">{{ b.label }}</div>
+              </sc-for>
+            </div>
+            <button class="btn btn-primary btn-block" onClick="{{ closeDropdowns }}">Aplicar</button>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="position:relative; flex:none;">
+        <div style="{{ dd.amenBtnStyle }}" onClick="{{ toggleAmenDD }}">Servicios <span>{{ dd.amenChevron }}</span></div>
+        <sc-if value="{{ dd.amenOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed; inset:0; z-index:900;" onClick="{{ closeDropdowns }}"></div>
+          <div style="position:fixed; top:{{ dd.top }}px; left:{{ dd.left }}px; width:260px; background:var(--color-bg); border:1px solid var(--color-divider); box-shadow:var(--shadow-md); z-index:950; padding:16px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--color-neutral-600); margin-bottom:10px;">Servicios y amenidades</div>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+              <sc-for list="{{ amenityOptions }}" as="a" hint-placeholder-count="6">
+                <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;"><input type="checkbox" checked="{{ a.checked }}" onChange="{{ a.onToggle }}" style="accent-color:var(--color-text);">{{ a.name }}</label>
+              </sc-for>
+            </div>
+            <button class="btn btn-primary btn-block" onClick="{{ closeDropdowns }}">Aplicar</button>
+          </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showSegmentFieldFilter }}">
+      <div style="position:relative; flex:none;">
+        <div style="{{ dd.segFieldBtnStyle }}" onClick="{{ toggleSegFieldDD }}">{{ segmentFieldLabel }} <span>{{ dd.segFieldChevron }}</span></div>
+        <sc-if value="{{ dd.segFieldOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed; inset:0; z-index:900;" onClick="{{ closeDropdowns }}"></div>
+          <div style="position:fixed; top:{{ dd.top }}px; left:{{ dd.left }}px; width:280px; background:var(--color-bg); border:1px solid var(--color-divider); box-shadow:var(--shadow-md); z-index:950; padding:16px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--color-neutral-600); margin-bottom:12px;">{{ segmentFieldLabel }}</div>
+            <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:14px;">
+              <sc-for list="{{ segmentFieldOptions }}" as="o" hint-placeholder-count="4">
+                <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;"><input type="checkbox" style="accent-color:var(--color-text);">{{ o }}</label>
+              </sc-for>
+            </div>
+            <button class="btn btn-primary btn-block" onClick="{{ closeDropdowns }}">Aplicar</button>
+          </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <div style="position:relative; flex:none;">
+        <div style="{{ dd.sizeBtnStyle }}" onClick="{{ toggleSizeDD }}">m² <span>{{ dd.sizeChevron }}</span></div>
+        <sc-if value="{{ dd.sizeOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed; inset:0; z-index:900;" onClick="{{ closeDropdowns }}"></div>
+          <div style="position:fixed; top:{{ dd.top }}px; left:{{ dd.left }}px; width:280px; background:var(--color-bg); border:1px solid var(--color-divider); box-shadow:var(--shadow-md); z-index:950; padding:16px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--color-neutral-600); margin-bottom:12px;">Superficie (m²)</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+              <div class="field"><label style="font-size:11px;">Mínimo</label><input class="input" type="text" placeholder="Sin mínimo" value="{{ sizeMin }}" onChange="{{ onSizeMin }}" style="font-size:12.5px; height:34px;"></div>
+              <div class="field"><label style="font-size:11px;">Máximo</label><input class="input" type="text" placeholder="Sin máximo" value="{{ sizeMax }}" onChange="{{ onSizeMax }}" style="font-size:12.5px; height:34px;"></div>
+            </div>
+            <button class="btn btn-primary btn-block" onClick="{{ closeDropdowns }}">Aplicar</button>
+          </div>
+        </sc-if>
+      </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isHome }}">
+      <div style="flex:1;"></div>
+    </sc-if>
+    <div style="display:flex; align-items:center; gap:10px; flex:none;">
+      <sc-if value="{{ isLoggedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;">
+          <div style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; padding:8px 14px; border-radius:20px; cursor:pointer;" style-hover="background:var(--color-neutral-100);" onClick="{{ toggleUserMenu }}">
+            <div style="width:22px; height:22px; border-radius:50%; background:var(--color-text); color:#fff; display:flex; align-items:center; justify-content:center; font-size:10px;">{{ user.name }}</div>
+            {{ user.name }}
+          </div>
+          <sc-if value="{{ userMenuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:fixed; inset:0; z-index:900;" onClick="{{ toggleUserMenu }}"></div>
+            <div style="position:absolute; top:44px; right:0; width:200px; background:var(--color-bg); border:1px solid var(--color-divider); box-shadow:var(--shadow-md); z-index:950; padding:8px;">
+              <div style="padding:9px 10px; font-size:12.5px; cursor:pointer;" style-hover="background:var(--color-neutral-100);">Mis favoritos</div>
+              <div style="padding:9px 10px; font-size:12.5px; cursor:pointer;" style-hover="background:var(--color-neutral-100);">Búsquedas guardadas</div>
+              <div style="padding:9px 10px; font-size:12.5px; cursor:pointer;" style-hover="background:var(--color-neutral-100);">Vistos recientemente</div>
+              <div style="height:1px; background:var(--color-divider); margin:6px 0;"></div>
+              <div style="padding:9px 10px; font-size:12.5px; cursor:pointer;" style-hover="background:var(--color-neutral-100);" onClick="{{ logout }}">Cerrar sesión</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{ notLoggedIn }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:12px; padding:9px 16px; border-radius:20px; cursor:pointer; white-space:nowrap;" style-hover="background:var(--color-neutral-100);" onClick="{{ openLogin }}">Iniciar sesión</div>
+        <div style="font-size:12px; background:var(--color-text); color:#fff; padding:9px 16px; border-radius:20px; font-weight:700; cursor:pointer; white-space:nowrap;" onClick="{{ openRegister }}">Crear cuenta</div>
+      </sc-if>
+    </div>
+  </div>
+  <sc-if value="{{ isResults }}">
+    <div style="flex:none; height:34px; display:flex; align-items:center; padding:0 20px; font-size:11.5px; color:var(--color-neutral-600); border-bottom:2px solid var(--color-divider);">{{ activeSegmentLabel }}</div>
+  </sc-if>
+
+  <!-- HOME / HERO SEARCH -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:1; min-height:0; overflow-y:auto;">
+      <div style="position:relative; height:340px; flex:none;">
+        <div style="{{ heroBgStyle }}"></div>
+        <sc-if value="{{ hasHeroImage }}" hint-placeholder-val="{{ true }}">
+          <image-slot id="pub-hero" shape="rect" placeholder="Foto de interior de una propiedad en San Luis Potosí" style="position:absolute; inset:0; width:100%; height:100%;"></image-slot>
+        </sc-if>
+        <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 40%);"></div>
+        <div style="position:absolute; top:36px; left:0; right:0; text-align:center;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:34px; color:#fff; text-shadow:0 2px 12px rgba(0,0,0,0.35);">Encuentra tu propiedad</div>
+        </div>
+
+        <div style="position:absolute; bottom:44px; left:50%; transform:translateX(-50%); width:640px; background:var(--color-bg); box-shadow:var(--shadow-lg);">
+          <div style="display:flex; border-bottom:1px solid var(--color-divider);">
+            <sc-for list="{{ operationTabs }}" as="t" hint-placeholder-count="4">
+              <div style="{{ t.style }}" onClick="{{ t.onClick }}">{{ t.label }}</div>
+            </sc-for>
+          </div>
+          <div style="display:flex; gap:0; padding:16px;">
+            <select class="input" style="width:170px; flex:none; border-right:none; font-size:13px;">
+              <option>Departamento</option>
+              <option>Casa</option>
+              <option>Terreno</option>
+              <option>Local comercial</option>
+              <option>Nave industrial</option>
+              <option>Rancho</option>
+            </select>
+            <input class="input" type="text" placeholder="Ingresa ubicaciones o características (ej: alberca)" value="{{ query }}" onChange="{{ onQueryChange }}" style="flex:1; border-left:none; border-right:none; font-size:13px;">
+            <div onClick="{{ submitSearch }}" style="flex:none; background:var(--color-text); color:#fff; padding:0 22px; display:flex; align-items:center; font-weight:700; font-size:13px; cursor:pointer;" style-hover="background:var(--color-neutral-800);">Buscar</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:40px 64px; border-bottom:1px solid var(--color-divider);">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:20px; margin-bottom:20px;">Principales zonas</div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:20px;">
+          <sc-for list="{{ topZones }}" as="z" hint-placeholder-count="4">
+            <div style="border:1px solid var(--color-divider); cursor:pointer;" onClick="{{ z.onClick }}">
+              <div style="width:100%; aspect-ratio:4/3; background:var(--color-neutral-200);"></div>
+              <div style="padding:12px 14px; display:flex; justify-content:space-between; align-items:baseline;">
+                <div>
+                  <div style="font-family:var(--font-heading); font-weight:800; font-size:14px;">{{ z.name }}</div>
+                  <div style="font-size:11.5px; color:var(--color-neutral-600); margin-top:2px;">{{ z.count }} propiedades</div>
+                </div>
+                <span style="font-size:13px; color:var(--color-neutral-600);">{{ z.chevron }}</span>
+              </div>
+              <sc-if value="{{ z.expanded }}" hint-placeholder-val="{{ false }}">
+                <div style="border-top:1px solid var(--color-divider); padding:12px 14px;">
+                  <div style="font-size:11px; color:var(--color-neutral-600); margin-bottom:8px;">Score promedio: <strong style="color:var(--color-text);">{{ z.avgScore }}</strong></div>
+                  <sc-for list="{{ z.topProps }}" as="tp" hint-placeholder-count="2">
+                    <div style="display:flex; justify-content:space-between; font-size:11.5px; padding:5px 0; border-top:1px solid var(--color-divider);">
+                      <span style="color:var(--color-neutral-700); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:110px;">{{ tp.title }}</span>
+                      <span style="font-weight:700;">{{ tp.price }}</span>
+                    </div>
+                  </sc-for>
+                  <div style="font-size:11.5px; text-decoration:underline; margin-top:10px; cursor:pointer;" onClick="{{ z.onSearch }}">Ver todas en {{ z.name }}</div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="padding:48px 64px; display:flex; align-items:center; gap:48px; border-bottom:1px solid var(--color-divider);">
+        <div style="flex:1; max-width:380px;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:10px;">Explora por segmento</div>
+          <div style="font-size:13.5px; color:var(--color-neutral-600); margin-bottom:20px;">Residencial, comercial, industrial, terrenos, ranchos y desarrollos — todo en un solo lugar.</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <sc-for list="{{ segments }}" as="seg" hint-placeholder-count="7">
+              <div class="tag tag-outline" onClick="{{ seg.onSearchClick }}" style="cursor:pointer;">{{ seg.name }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div style="border:1px solid var(--color-divider); overflow:hidden;">
+            <div style="width:100%; aspect-ratio:4/3; background:var(--color-neutral-200);"></div>
+            <div style="padding:10px;"><div style="font-family:var(--font-heading); font-weight:800; font-size:14px;">$2.4M</div><div style="font-size:11px; color:var(--color-neutral-600);">Lomas de San Luis · Residencial</div></div>
+          </div>
+          <div style="border:1px solid var(--color-divider); overflow:hidden;">
+            <div style="width:100%; aspect-ratio:4/3; background:var(--color-neutral-200);"></div>
+            <div style="padding:10px;"><div style="font-family:var(--font-heading); font-weight:800; font-size:14px;">$5.6M</div><div style="font-size:11px; color:var(--color-neutral-600);">Zona Industrial · Industrial</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:48px 64px; display:flex; align-items:start; gap:56px;">
+        <div style="flex:1; max-width:400px;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:10px;">Recomendaciones personalizadas</div>
+          <sc-if value="{{ isLoggedIn }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:13.5px; color:var(--color-neutral-600);">Basado en tu presupuesto y zona de interés guardados.</div>
+          </sc-if>
+          <sc-if value="{{ notLoggedIn }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:13.5px; color:var(--color-neutral-600); margin-bottom:20px;">Elige tu presupuesto para ver propiedades a tu medida — sin necesidad de crear cuenta.</div>
+
+            <div style="border:1px solid var(--color-divider);">
+              <div style="padding:18px 20px 6px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--color-neutral-600);">Rango de precio</div>
+              <div style="padding:14px 20px 0;">
+                <div style="display:flex; align-items:flex-end; gap:1px; height:40px;">
+                  <sc-for list="{{ budgetHistogram }}" as="bar" hint-placeholder-count="18">
+                    <div style="flex:1; height:{{ bar.h }}px; {{ bar.style }}"></div>
+                  </sc-for>
+                </div>
+                <div style="position:relative; height:20px; margin-top:4px;">
+                  <div style="position:absolute; top:9px; left:0; right:0; height:2px; background:var(--color-neutral-300);"></div>
+                  <div style="{{ budgetFillStyle }} top:9px; height:2px;"></div>
+                  <input class="budget-range" type="range" min="0" max="20" step="0.5" value="{{ budgetMinVal }}" onChange="{{ onBudgetMinRange }}" style="position:absolute; inset:0; width:100%; margin:0; background:transparent; pointer-events:none;">
+                  <input class="budget-range" type="range" min="0" max="20" step="0.5" value="{{ budgetMaxVal }}" onChange="{{ onBudgetMaxRange }}" style="position:absolute; inset:0; width:100%; margin:0; background:transparent; pointer-events:none;">
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--color-neutral-600); margin-top:4px;">
+                  <span>{{ budgetMinLabel }}</span>
+                  <span>{{ budgetMaxLabel }}</span>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:18px 20px;">
+                <div class="field"><label style="font-size:11px;">Mínimo</label><input class="input" type="number" placeholder="Sin mínimo" value="{{ budgetMinVal }}" onChange="{{ onBudgetMinInput }}" style="font-size:13px; height:38px;"></div>
+                <div class="field"><label style="font-size:11px;">Máximo</label><input class="input" type="number" placeholder="Sin máximo" value="{{ budgetMaxVal }}" onChange="{{ onBudgetMaxInput }}" style="font-size:13px; height:38px;"></div>
+              </div>
+              <div style="padding:0 20px 20px;">
+                <button class="btn btn-primary btn-block" onClick="{{ applyBudget }}">Aplicar</button>
+              </div>
+            </div>
+            <div style="font-size:12px; text-decoration:underline; cursor:pointer; color:var(--color-neutral-700); margin-top:14px;" onClick="{{ openLogin }}">o inicia sesión para guardar tus preferencias</div>
+          </sc-if>
+        </div>
+        <div style="flex:1;">
+          <sc-if value="{{ hasGuestRecs }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; gap:1px; background:var(--color-divider); border:1px solid var(--color-divider);">
+              <sc-for list="{{ guestRecs }}" as="p" hint-placeholder-count="3">
+                <div style="background:var(--color-bg); display:flex; gap:0;">
+                  <div style="width:120px; aspect-ratio:4/3; background:var(--color-neutral-200); flex:none;"></div>
+                  <div style="padding:16px; display:flex; flex-direction:column; justify-content:center; gap:4px;">
+                    <div class="tag {{ p.scoreTagClass }}" style="font-size:10px; width:fit-content;">Score {{ p.score }}</div>
+                    <div style="font-family:var(--font-heading); font-weight:800; font-size:16px;">{{ p.price }}</div>
+                    <div style="font-size:12px; color:var(--color-neutral-600);">{{ p.title }} · {{ p.size }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isLoggedIn }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid var(--color-divider); display:flex; gap:0;">
+              <div style="width:40%; aspect-ratio:4/3; background:var(--color-neutral-200); flex:none;"></div>
+              <div style="padding:16px; display:flex; flex-direction:column; justify-content:center; gap:4px;">
+                <div class="tag tag-accent" style="font-size:10px; width:fit-content;">Score 92</div>
+                <div style="font-family:var(--font-heading); font-weight:800; font-size:16px;">$2.4M</div>
+                <div style="font-size:12px; color:var(--color-neutral-600);">Casa en Lomas de San Luis · 220 m²</div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- RESULTS -->
+  <sc-if value="{{ isResults }}">
+
+  <!-- MAIN -->
+  <div style="flex:1; min-height:0; position:relative; display:flex; flex-direction:column;">
+
+    <div style="flex:none; padding:14px 24px; border-bottom:2px solid var(--color-divider); display:flex; justify-content:space-between; align-items:baseline;">
+      <div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:15px;">Propiedades en San Luis Potosí</div>
+        <div style="font-size:11.5px; color:var(--color-neutral-600);">{{ count }} resultados</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:20px;">
+        <div style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--color-neutral-600);">
+          Ordenar:
+          <sc-for list="{{ sortOptions }}" as="so" hint-placeholder-count="3">
+            <span style="{{ so.style }}" onClick="{{ so.onClick }}">{{ so.name }}</span>
+          </sc-for>
+        </div>
+        <div style="font-size:11.5px; text-decoration:underline; cursor:pointer; color:var(--color-neutral-700);" onClick="{{ saveCurrentSearch }}">Guardar esta búsqueda</div>
+        <div style="{{ mapToggleStyle }}" onClick="{{ toggleMap }}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 6v15l7-3 8 3 7-3V3l-7 3-8-3z"></path><path d="M8 3v15M16 6v15"></path></svg>
+          {{ mapToggleLabel }}
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD GRID + MAP -->
+    <div style="flex:1; min-height:0; display:flex;">
+      <sc-if value="{{ showMap }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:0 0 44%; min-width:380px; position:relative; border-right:2px solid var(--color-text);">
+          <div ref="{{ mapRef }}" style="position:absolute; inset:0; width:100%; height:100%;"></div>
+          <div style="position:absolute; top:16px; left:16px; z-index:400; background:rgba(32,30,29,0.9); color:#fff; font-size:12px; font-weight:700; padding:8px 14px; white-space:nowrap;">{{ count }} propiedades</div>
+          <div style="position:absolute; top:16px; right:16px; z-index:401; width:34px; height:34px; background:#fff; border:2px solid var(--color-text); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; font-weight:700;" style-hover="background:var(--color-text); color:#fff;" onClick="{{ toggleMap }}">✕</div>
+        </div>
+      </sc-if>
+      <div style="{{ gridStyle }}" onScroll="{{ onGridScroll }}">
+        <sc-for list="{{ properties }}" as="p" hint-placeholder-count="6">
+          <div class="card-row" style="{{ p.rowStyle }}" onClick="{{ p.onSelect }}" style-hover="outline:2px solid var(--color-text); outline-offset:-2px;">
+            <div style="width:100%; aspect-ratio:4/3; background:var(--color-neutral-200); position:relative;">
+              <div class="tag {{ p.scoreTagClass }}" style="position:absolute; top:8px; left:8px; font-size:9.5px;">{{ p.score }}</div>
+              <div style="position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.9); display:flex; align-items:center; justify-content:center;" onClick="{{ p.onToggleFavorite }}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="{{ p.favIconFill }}" stroke="{{ p.favIconStroke }}" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+              </div>
+            </div>
+            <div style="padding:12px;">
+              <div style="font-family:var(--font-heading); font-weight:800; font-size:15px;">{{ p.price }}</div>
+              <div style="font-size:11.5px; color:var(--color-neutral-700); margin:3px 0;">{{ p.size }} · {{ p.segment }}</div>
+              <div style="font-size:11.5px; color:var(--color-neutral-600); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.address }}</div>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ hasMore }}">
+          <div style="grid-column:1/-1; text-align:center; padding:16px; font-size:12px; color:var(--color-neutral-600);">Cargando más propiedades…</div>
+        </sc-if>
+        <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+          <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--color-neutral-600); font-size:13.5px;">No encontramos propiedades para tu búsqueda. Intenta con otra dirección, colonia o CP.</div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  </sc-if>
+
+  <!-- AUTH MODAL -->
+  <sc-if value="{{ authOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:2100; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45);" onClick="{{ closeAuth }}">
+      <div style="width:380px; background:var(--color-bg); border:2px solid var(--color-text); padding:28px;" onClick="{{ stopClose }}">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:19px; margin-bottom:6px;">{{ authTitle }}</div>
+        <div style="font-size:12.5px; color:var(--color-neutral-600); margin-bottom:22px;">Guarda favoritos, búsquedas y alertas de propiedades.</div>
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:18px;">
+          <sc-if value="{{ authNotLogin }}" hint-placeholder-val="{{ false }}">
+            <input class="input" type="text" placeholder="Tu nombre" value="{{ authName }}" onChange="{{ onAuthName }}" style="font-size:13px;">
+          </sc-if>
+          <input class="input" type="text" placeholder="Correo electrónico" value="{{ authEmail }}" onChange="{{ onAuthEmail }}" style="font-size:13px;">
+          <sc-if value="{{ authNotLogin }}" hint-placeholder-val="{{ false }}">
+            <input class="input" type="text" placeholder="Teléfono" value="{{ authPhone }}" onChange="{{ onAuthPhone }}" style="font-size:13px;">
+          </sc-if>
+          <input class="input" type="password" placeholder="Contraseña" value="{{ authPassword }}" onChange="{{ onAuthPassword }}" style="font-size:13px;">
+          <sc-if value="{{ authNotLogin }}" hint-placeholder-val="{{ false }}">
+            <select class="input" value="{{ authZone }}" onChange="{{ onAuthZone }}" style="font-size:13px;">
+              <sc-for list="{{ segments }}" as="seg" hint-placeholder-count="7">
+                <option value="{{ seg.name }}">{{ seg.name }}</option>
+              </sc-for>
+            </select>
+          </sc-if>
+        </div>
+        <button class="btn btn-primary btn-block" onClick="{{ submitAuth }}">{{ authSubmitLabel }}</button>
+        <div style="text-align:center; font-size:12px; margin-top:16px; text-decoration:underline; cursor:pointer; color:var(--color-neutral-700);" onClick="{{ switchAuthMode }}">{{ authSwitchLabel }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- FAVORITES MODAL -->
+  <sc-if value="{{ favoritesOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:2100; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45);" onClick="{{ closeFavorites }}">
+      <div style="width:480px; max-height:80vh; overflow-y:auto; background:var(--color-bg); border:2px solid var(--color-text); padding:24px;" onClick="{{ stopClose }}">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:18px;">Mis favoritos</div>
+          <div style="cursor:pointer; font-size:16px;" onClick="{{ closeFavorites }}">✕</div>
+        </div>
+        <sc-if value="{{ hasFavorites }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:1px; background:var(--color-divider); border:1px solid var(--color-divider);">
+            <sc-for list="{{ favoritedProperties }}" as="p" hint-placeholder-count="3">
+              <div style="background:var(--color-bg); display:flex; gap:0;">
+                <div style="width:100px; aspect-ratio:4/3; background:var(--color-neutral-200); flex:none;"></div>
+                <div style="padding:14px; display:flex; flex-direction:column; justify-content:center; gap:4px;">
+                  <div class="tag {{ p.scoreTagClass }}" style="font-size:10px; width:fit-content;">Score {{ p.score }}</div>
+                  <div style="font-family:var(--font-heading); font-weight:800; font-size:15px;">{{ p.price }}</div>
+                  <div style="font-size:12px; color:var(--color-neutral-600);">{{ p.title }} · {{ p.size }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noFavorites }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center; color:var(--color-neutral-600); font-size:13px; padding:30px 0;">Aún no tienes propiedades favoritas. Toca el corazón en cualquier tarjeta para guardarla.</div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- COMING SOON MODAL -->
+  <sc-if value="{{ comingSoonOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:2100; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45);" onClick="{{ closeComingSoon }}">
+      <div style="width:360px; background:var(--color-bg); border:2px solid var(--color-text); padding:28px; text-align:center;" onClick="{{ stopClose }}">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:17px; margin-bottom:8px;">{{ comingSoon }}</div>
+        <div style="font-size:13px; color:var(--color-neutral-600); margin-bottom:20px;">Esta sección estará disponible próximamente.</div>
+        <button class="btn btn-secondary btn-block" onClick="{{ closeComingSoon }}">Cerrar</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- SAVED SEARCHES / ALERTS MODAL -->
+  <sc-if value="{{ savedSearchesOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:2100; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45);" onClick="{{ closeSavedSearches }}">
+      <div style="width:480px; max-height:80vh; overflow-y:auto; background:var(--color-bg); border:2px solid var(--color-text); padding:24px;" onClick="{{ stopClose }}">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:17px;">Búsquedas guardadas</div>
+          <div onClick="{{ closeSavedSearches }}" style="cursor:pointer; font-size:16px;">✕</div>
+        </div>
+        <sc-if value="{{ hasSavedSearches }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:1px; background:var(--color-divider); border:1px solid var(--color-divider);">
+            <sc-for list="{{ savedSearchList }}" as="s" hint-placeholder-count="3">
+              <div style="background:var(--color-bg); padding:14px 16px; display:flex; align-items:center; gap:14px;">
+                <div style="flex:1; min-width:0; cursor:pointer;" onClick="{{ s.onApply }}">
+                  <div style="font-weight:700; font-size:13.5px;">{{ s.label }}</div>
+                  <div style="font-size:11.5px; color:var(--color-neutral-600); margin-top:2px;">{{ s.matchCount }} coincidencias ahora</div>
+                </div>
+                <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:var(--color-neutral-600); cursor:pointer; flex:none;">
+                  <input type="checkbox" checked="{{ s.alertsOn }}" onChange="{{ s.onToggleAlert }}" style="accent-color:var(--color-text);"> Alertas
+                </label>
+                <div onClick="{{ s.onDelete }}" style="cursor:pointer; font-size:14px; color:var(--color-neutral-600); flex:none;">✕</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noSavedSearches }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center; color:var(--color-neutral-600); font-size:13px; padding:30px 0;">Aún no tienes búsquedas guardadas. Usa "Guardar esta búsqueda" en los resultados y activa alertas para recibir avisos cuando aparezcan coincidencias nuevas.</div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- MESSAGES / INBOX MODAL -->
+  <sc-if value="{{ inboxOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:2100; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45);" onClick="{{ closeInbox }}">
+      <div style="width:480px; max-height:80vh; overflow-y:auto; background:var(--color-bg); border:2px solid var(--color-text); padding:24px;" onClick="{{ stopClose }}">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:17px;">Mensajes</div>
+          <div onClick="{{ closeInbox }}" style="cursor:pointer; font-size:16px;">✕</div>
+        </div>
+        <sc-if value="{{ hasMessages }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:1px; background:var(--color-divider); border:1px solid var(--color-divider);">
+            <sc-for list="{{ messageList }}" as="m" hint-placeholder-count="3">
+              <div style="background:var(--color-bg); padding:14px 16px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
+                  <div style="font-weight:700; font-size:13.5px;">{{ m.propertyTitle }}</div>
+                  <div style="font-size:11px; color:var(--color-neutral-600);">{{ m.date }}</div>
+                </div>
+                <div style="font-size:12.5px; color:var(--color-neutral-700); margin-bottom:6px;">{{ m.text }}</div>
+                <span class="tag tag-outline" style="font-size:10px;">{{ m.status }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noMessages }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center; color:var(--color-neutral-600); font-size:13px; padding:30px 0;">Aún no has enviado mensajes. Contacta al propietario desde la ficha de una propiedad.</div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ selected }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:2000; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45);" onClick="{{ closeSelected }}">
+      <div style="width:640px; max-height:86vh; overflow-y:auto; background:var(--color-bg); border:2px solid var(--color-text);" onClick="{{ stopClose }}">
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:var(--color-divider);">
+          <div style="background:var(--color-neutral-200); height:150px;"></div>
+          <div style="background:var(--color-neutral-200); height:150px;"></div>
+          <div style="background:var(--color-neutral-200); height:150px;"></div>
+        </div>
+        <div style="padding:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:4px;">
+            <div style="font-family:var(--font-heading); font-weight:800; font-size:20px; max-width:70%;">{{ selected.title }}</div>
+            <div class="tag {{ selected.scoreTagClass }}" style="font-size:11px;">Opportunity Score {{ selected.score }}</div>
+          </div>
+          <div style="font-size:13px; color:var(--color-neutral-600); margin-bottom:20px;">{{ selected.address }}</div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:24px; padding:18px 0; border-top:1px solid var(--color-divider); border-bottom:1px solid var(--color-divider); margin-bottom:20px;">
+            <sc-for list="{{ selected.specs }}" as="s" hint-placeholder-count="6">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:6px; min-width:64px;">
+                <sc-if value="{{ s.isArea }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></sc-if>
+                <sc-if value="{{ s.isConstr }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"></path></svg></sc-if>
+                <sc-if value="{{ s.isBano }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M6 12V6a2 2 0 0 1 2-2h1M6 12v9M18 12v9M9 21h6"></path></svg></sc-if>
+                <sc-if value="{{ s.isEstac }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l1.5-6h9L18 17M8 11h8M9 17v2M15 17v2"></path></svg></sc-if>
+                <sc-if value="{{ s.isRec }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6M3 18h18M5 12V8h6v4"></path></svg></sc-if>
+                <sc-if value="{{ s.isAntig }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg></sc-if>
+                <div style="font-size:11.5px; font-weight:600; text-align:center;">{{ s.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:10px;">Ficha técnica</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; font-size:13px; margin-bottom:24px;">
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--color-neutral-600);">Precio</span><span style="font-weight:700;">{{ selected.price }}</span></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--color-neutral-600);">Precio/m²</span><span style="font-weight:700;">{{ selected.pricePerSqm }}</span></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--color-neutral-600);">Superficie</span><span style="font-weight:700;">{{ selected.size }}</span></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--color-neutral-600);">Ubicación</span><span style="font-weight:700;">{{ selected.address }}</span></div>
+          </div>
+
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:10px;">¿Por qué este Opportunity Score?</div>
+          <p style="font-size:13px; line-height:1.55; color:var(--color-neutral-700); margin:0 0 24px;">{{ selected.scoreNote }}</p>
+
+          <sc-if value="{{ contactOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid var(--color-divider); padding:16px; margin-bottom:20px;">
+              <div style="font-family:var(--font-heading); font-weight:800; font-size:13px; margin-bottom:12px;">Contactar sobre esta propiedad</div>
+              <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
+                <input class="input" type="text" placeholder="Tu nombre" value="{{ contactName }}" onChange="{{ onContactName }}" style="font-size:13px;">
+                <input class="input" type="text" placeholder="Tu teléfono" value="{{ contactPhone }}" onChange="{{ onContactPhone }}" style="font-size:13px;">
+                <textarea class="input" placeholder="Mensaje" value="{{ contactMessage }}" onChange="{{ onContactMessage }}" style="font-size:13px;"></textarea>
+              </div>
+              <sc-if value="{{ contactSent }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px; color:var(--color-neutral-600); margin-bottom:10px;">Mensaje enviado — puedes verlo en tu bandeja de Mensajes.</div>
+              </sc-if>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-primary" style="flex:1;" onClick="{{ submitContact }}">Enviar mensaje</button>
+                <a href="{{ waLink }}" style="flex:1; text-align:center; text-decoration:none; color:var(--color-text); border:1px solid var(--color-divider); padding:9px; font-size:12.5px; font-weight:700;" style-hover="border-color:var(--color-text);">WhatsApp</a>
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="display:flex; gap:12px;">
+            <button class="btn btn-secondary" style="flex:1;" onClick="{{ closeSelected }}">Cerrar</button>
+            <sc-if value="{{ notContactOpen }}">
+              <button class="btn btn-primary" style="flex:1;" onClick="{{ openContact }}">Contactar</button>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { view: 'home', query: '', activeSegment: 'Todos', sort: 'Score', selectedId: null, contactOpen: false, openDD: null, beds: 'Todas', baths: 'Todos', operation: 'Rentar', showMap: false, visibleCount: 9, editingZones: false, zoneOverrides: null, zoneDraft: null,
+    authOpen: false, authMode: 'login', authName: '', authEmail: '', authPhone: '', authZone: 'Residencial', authPassword: '', user: null, favorites: [], userMenuOpen: false,
+    homeBudget: '', guestRecsShown: false, budgetMin: 0, budgetMax: 20, appliedMin: 0, appliedMax: 20, expandedZone: null,
+    priceMin: '', priceMax: '', sizeMin: '', sizeMax: '', selectedAmenities: [], fPriceMin: 0, fPriceMax: 20,
+    favoritesOpen: false, comingSoon: null, mapBounds: null, heroImage: '',
+    contactName: '', contactPhone: '', contactMessage: '', contactSent: false,
+    savedSearchesOpen: false, inboxOpen: false, savedSearchesVersion: 0 };
+  BUDGET_CAP = 20;
+  PAGE_SIZE = 9;
+
+  amenities = ['Cochera', 'Jardín', 'Alberca', 'Seguridad 24h', 'Aire acondicionado', 'Cuarto de servicio'];
+  mapRef = React.createRef();
+  map = null;
+  markersLayer = null;
+
+  allProperties = [];
+
+  componentDidMount() {
+    this.loadShared();
+    this.onPropsChanged = () => { this.loadShared(); this.forceUpdate(); };
+    window.addEventListener('ah-properties-changed', this.onPropsChanged);
+    window.addEventListener('storage', this.onPropsChanged);
+    this.setState({ heroImage: localStorage.getItem('ah-site-hero') || '' });
+    this.onHeroChanged = () => this.setState({ heroImage: localStorage.getItem('ah-site-hero') || '' });
+    window.addEventListener('ah-hero-changed', this.onHeroChanged);
+    window.addEventListener('storage', this.onHeroChanged);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('ah-properties-changed', this.onPropsChanged);
+    window.removeEventListener('storage', this.onPropsChanged);
+    window.removeEventListener('ah-hero-changed', this.onHeroChanged);
+    window.removeEventListener('storage', this.onHeroChanged);
+  }
+  loadShared() {
+    if (window.AHProperties) this.allProperties = window.AHProperties.load();
+  }
+
+  ensureMap() {
+    if (this.map || !window.L || !this.mapRef.current) {
+      if (!this.map) setTimeout(() => this.ensureMap(), 50);
+      return;
+    }
+    this.map = L.map(this.mapRef.current, { zoomControl: false }).setView([22.1565, -100.9855], 12);
+    L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(this.map);
+    this.markersLayer = L.layerGroup().addTo(this.map);
+    this.syncMarkers();
+    this.map.on('moveend', () => this.onMapBoundsChange());
+    this.map.on('zoomend', () => this.syncMarkers());
+    this.onMapBoundsChange();
+  }
+
+  onMapBoundsChange() {
+    if (!this.map) return;
+    const b = this.map.getBounds();
+    this.setState({ mapBounds: { south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() } });
+  }
+
+  componentDidUpdate(prevState) {
+    if (prevState && (prevState.activeSegment !== this.state.activeSegment || prevState.selectedId !== this.state.selectedId)) {
+      this.syncMarkers();
+    }
+  }
+
+  getVisible() {
+    const active = this.state.activeSegment;
+    return active === 'Todos' ? this.allProperties : this.allProperties.filter(p => p.segment === active);
+  }
+
+  syncMarkers() {
+    if (!this.markersLayer || !this.map) return;
+    this.markersLayer.clearLayers();
+    this.buildClusters(this.getVisible()).forEach(group => {
+      if (group.length === 1) {
+        const p = group[0];
+        const hi = p.score >= 80 || p.title === this.state.selectedId;
+        const compactPrice = window.AHProperties && window.AHProperties.formatMoneyCompactShort ? window.AHProperties.formatMoneyCompactShort(p.price) : p.price;
+        const html = `<div style="display:flex;flex-direction:column;align-items:center;"><div style="font-family:var(--font-heading);font-weight:800;font-size:11px;padding:4px 8px;white-space:nowrap;border:2px solid var(--color-text);background:${hi ? 'var(--color-text)' : 'var(--color-bg)'};color:${hi ? '#fff' : 'var(--color-text)'};">${compactPrice}</div><div style="width:2px;height:10px;background:var(--color-text);"></div></div>`;
+        const icon = L.divIcon({ html, className: '', iconSize: null, iconAnchor: [30, 34] });
+        const marker = L.marker([p.lat, p.lng], { icon }).addTo(this.markersLayer);
+        marker.on('click', () => this.selectProperty(p));
+      } else {
+        const lat = group.reduce((s, p) => s + p.lat, 0) / group.length;
+        const lng = group.reduce((s, p) => s + p.lng, 0) / group.length;
+        const html = `<div style="display:flex;flex-direction:column;align-items:center;"><div style="font-family:var(--font-heading);font-weight:800;font-size:11px;padding:4px 8px;white-space:nowrap;border:2px solid var(--color-text);background:var(--color-accent);color:#fff;border-radius:999px;">${group.length} propiedades</div><div style="width:2px;height:10px;background:var(--color-text);"></div></div>`;
+        const icon = L.divIcon({ html, className: '', iconSize: null, iconAnchor: [30, 34] });
+        const marker = L.marker([lat, lng], { icon }).addTo(this.markersLayer);
+        marker.on('click', () => this.map.setView([lat, lng], Math.min(this.map.getZoom() + 2, 18)));
+      }
+    });
+  }
+
+  buildClusters(visible) {
+    const THRESH = 100;
+    let groups = visible
+      .filter(p => typeof p.lat === 'number' && typeof p.lng === 'number')
+      .map(p => ({ props: [p], pt: this.map.latLngToContainerPoint([p.lat, p.lng]) }));
+    let merged = true;
+    while (merged) {
+      merged = false;
+      outer: for (let i = 0; i < groups.length; i++) {
+        for (let j = i + 1; j < groups.length; j++) {
+          const dx = groups[i].pt.x - groups[j].pt.x, dy = groups[i].pt.y - groups[j].pt.y;
+          if (Math.sqrt(dx * dx + dy * dy) < THRESH) {
+            const a = groups[i], b = groups[j];
+            const n = a.props.length + b.props.length;
+            const pt = { x: (a.pt.x * a.props.length + b.pt.x * b.props.length) / n, y: (a.pt.y * a.props.length + b.pt.y * b.props.length) / n };
+            groups.splice(j, 1); groups.splice(i, 1);
+            groups.push({ props: a.props.concat(b.props), pt });
+            merged = true;
+            break outer;
+          }
+        }
+      }
+    }
+    return groups.map(g => g.props);
+  }
+
+  goHome() { this.setState({ view: 'home' }); }
+
+  computeTopZones() {
+    const counts = {};
+    this.allProperties.forEach(p => {
+      const zone = p.address.split(',')[0].trim();
+      counts[zone] = (counts[zone] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([zone, count]) => ({ zone, count }));
+  }
+  startEditZones() {
+    const base = this.state.zoneOverrides || this.computeTopZones().map(z => z.zone);
+    this.setState({ editingZones: true, zoneDraft: [...base] });
+  }
+  setZoneDraft(i, val) {
+    this.setState(s => { const d = [...s.zoneDraft]; d[i] = val; return { zoneDraft: d }; });
+  }
+  saveZones() { this.setState(s => ({ zoneOverrides: s.zoneDraft, editingZones: false })); }
+  cancelEditZones() { this.setState({ editingZones: false }); }
+  resetZonesAuto() { this.setState({ zoneOverrides: null, editingZones: false }); }
+
+  openAuth(mode) { this.setState({ authOpen: true, authMode: mode }); }
+  closeAuth() { this.setState({ authOpen: false }); }
+  switchAuthMode() { this.setState(s => ({ authMode: s.authMode === 'login' ? 'register' : 'login' })); }
+  loadUsers() {
+    try { return JSON.parse(localStorage.getItem('ah-registered-users') || '[]'); } catch (e) { return []; }
+  }
+  saveUsers(users) { localStorage.setItem('ah-registered-users', JSON.stringify(users)); }
+
+  submitAuth() {
+    const email = this.state.authEmail;
+    const name = this.state.authName || (email || 'Usuario').split('@')[0];
+    const now = new Date().toISOString();
+    const users = this.loadUsers();
+    const existing = users.find(u => u.email === email);
+    if (this.state.authMode === 'register' && !existing) {
+      users.push({ name, email, phone: this.state.authPhone, zone: this.state.authZone, registeredAt: now, lastActivity: now });
+      this.saveUsers(users);
+    } else if (existing) {
+      existing.lastActivity = now;
+      this.saveUsers(users);
+    }
+    this.setState({ user: { name, email }, authOpen: false, authName: '', authEmail: '', authPhone: '', authPassword: '' });
+  }
+  logout() { this.setState({ user: null, favorites: [], userMenuOpen: false }); }
+  toggleUserMenu() { this.setState(s => ({ userMenuOpen: !s.userMenuOpen })); }
+  priceNum(p) { return parseFloat(p.price.replace(/[^0-9.]/g, '')); }
+  setBudgetMin(v) { const n = Math.min(parseFloat(v) || 0, this.state.budgetMax); this.setState({ budgetMin: n }); }
+  setBudgetMax(v) { const n = Math.max(parseFloat(v) || 0, this.state.budgetMin); this.setState({ budgetMax: n }); }
+  applyBudget() { this.setState(s => ({ appliedMin: s.budgetMin, appliedMax: s.budgetMax })); }
+  toggleZone(name) { this.setState(s => ({ expandedZone: s.expandedZone === name ? null : name })); }
+  searchZone2(name) { this.setState({ view: 'results', query: name, activeSegment: 'Todos', visibleCount: this.PAGE_SIZE }); }
+  openFavorites() { this.setState({ favoritesOpen: true }); }
+  closeFavorites() { this.setState({ favoritesOpen: false }); }
+  openComingSoon(label) { this.setState({ comingSoon: label }); }
+  closeComingSoon() { this.setState({ comingSoon: null }); }
+  toggleFavorite(title) {
+    if (!this.state.user) { this.openAuth('login'); return; }
+    this.setState(s => ({ favorites: s.favorites.includes(title) ? s.favorites.filter(t => t !== title) : [...s.favorites, title] }));
+  }
+  goToMapSearch() {
+    this.setState({ view: 'results', showMap: true });
+    setTimeout(() => this.ensureMap(), 60);
+  }
+  toggleMap() {
+    const next = !this.state.showMap;
+    this.setState({ showMap: next, mapBounds: next ? this.state.mapBounds : null });
+    if (next) setTimeout(() => this.ensureMap(), 60);
+  }
+  toggleDD(name, e) {
+    this.setState(s => {
+      if (s.openDD === name) return { openDD: null };
+      if (e && e.currentTarget) {
+        const r = e.currentTarget.getBoundingClientRect();
+        return { openDD: name, ddTop: r.bottom + 6, ddLeft: r.left };
+      }
+      return { openDD: name };
+    });
+  }
+  toggleSegFieldDD(e) { this.toggleDD('segField', e); }
+  toggleBathsDD(e) { this.toggleDD('baths', e); }
+  toggleAmenDD(e) { this.toggleDD('amen', e); }
+  toggleOpDD(e) { this.toggleDD('op', e); }
+  togglePtypeDD(e) { this.toggleDD('ptype', e); }
+  setOperation(v) { this.setState({ operation: v }); this.closeDropdowns(); }
+  setBaths(label) { this.setState({ baths: label }); }
+  closeDropdowns() { this.setState({ openDD: null }); }
+  setBeds(label) { this.setState({ beds: label }); }
+  setPriceMin(v) { this.setState({ priceMin: v }); }
+  setPriceMax(v) { this.setState({ priceMax: v }); }
+  setFPriceMin(v) { const n = Math.min(parseFloat(v) || 0, this.state.fPriceMax); this.setState({ fPriceMin: n }); }
+  setFPriceMax(v) { const n = Math.max(parseFloat(v) || 0, this.state.fPriceMin); this.setState({ fPriceMax: n }); }
+  applyFPrice() {
+    this.setState(s => ({ priceMin: s.fPriceMin > 0 ? String(s.fPriceMin) : '', priceMax: s.fPriceMax < this.BUDGET_CAP ? String(s.fPriceMax) : '' }));
+    this.closeDropdowns();
+  }
+  setSizeMin(v) { this.setState({ sizeMin: v }); }
+  setSizeMax(v) { this.setState({ sizeMax: v }); }
+  toggleAmenity(name) {
+    this.setState(s => ({ selectedAmenities: s.selectedAmenities.includes(name) ? s.selectedAmenities.filter(a => a !== name) : [...s.selectedAmenities, name] }));
+  }
+  sizeNum(p) { return parseFloat((p.size || '0').replace(/[^0-9.]/g, '')) || 0; }
+  submitSearch() {
+    this.setState({ view: 'results', visibleCount: this.PAGE_SIZE });
+  }
+  searchSegment(name) {
+    this.setState({ view: 'results', activeSegment: name, visibleCount: this.PAGE_SIZE });
+  }
+  setSegment(name) { this.setState({ activeSegment: name, visibleCount: this.PAGE_SIZE }); }
+  setSort(name) { this.setState({ sort: name }); }
+  onGridScroll(e) {
+    const el = e.target;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 300) {
+      this.setState(s => ({ visibleCount: s.visibleCount + this.PAGE_SIZE }));
+    }
+  }
+  selectProperty(p) {
+    this.setState({ selectedId: p.title, contactOpen: false });
+    if (this.map) this.map.flyTo([p.lat, p.lng], 14, { duration: 0.6 });
+  }
+  closeSelected() { this.setState({ selectedId: null }); }
+  openContact() { this.setState({ contactOpen: true, contactName: '', contactPhone: '', contactMessage: '', contactSent: false }); }
+  closeContact() { this.setState({ contactOpen: false }); }
+
+  userKey() { return this.state.user ? this.state.user.email : null; }
+  loadMessages() {
+    const key = this.userKey();
+    if (!key) return [];
+    try { return JSON.parse(localStorage.getItem('ah-messages-' + key) || '[]'); } catch (e) { return []; }
+  }
+  saveMessages(list) {
+    const key = this.userKey();
+    if (!key) return;
+    localStorage.setItem('ah-messages-' + key, JSON.stringify(list));
+  }
+  submitContact() {
+    const p = this.allProperties.find(x => x.title === this.state.selectedId);
+    if (!p) return;
+    if (!this.state.user) { this.openAuth('login'); return; }
+    const list = this.loadMessages();
+    list.unshift({
+      id: 'm' + Date.now(), propertyTitle: p.title,
+      text: this.state.contactMessage || `Hola, me interesa "${p.title}". ${this.state.contactName ? 'Soy ' + this.state.contactName + '.' : ''}`,
+      date: new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }),
+      status: 'Enviado — respuesta pendiente'
+    });
+    this.saveMessages(list);
+    this.setState({ contactSent: true });
+  }
+
+  loadSavedSearches() {
+    const key = this.userKey();
+    if (!key) return [];
+    try { return JSON.parse(localStorage.getItem('ah-saved-searches-' + key) || '[]'); } catch (e) { return []; }
+  }
+  saveSavedSearches(list) {
+    const key = this.userKey();
+    if (!key) return;
+    localStorage.setItem('ah-saved-searches-' + key, JSON.stringify(list));
+    this.setState(s => ({ savedSearchesVersion: s.savedSearchesVersion + 1 }));
+  }
+  currentFilterSnapshot() {
+    return {
+      query: this.state.query, activeSegment: this.state.activeSegment, beds: this.state.beds, baths: this.state.baths,
+      operation: this.state.operation, priceMin: this.state.priceMin, priceMax: this.state.priceMax,
+      sizeMin: this.state.sizeMin, sizeMax: this.state.sizeMax, selectedAmenities: this.state.selectedAmenities
+    };
+  }
+  filterLabel(f) {
+    const parts = [f.query || 'Todas las zonas', f.activeSegment !== 'Todos' ? f.activeSegment : null,
+      f.priceMin || f.priceMax ? `$${f.priceMin || '0'}–${f.priceMax || '∞'}` : null].filter(Boolean);
+    return parts.join(' · ');
+  }
+  matchFilter(p, f) {
+    if (f.activeSegment !== 'Todos' && p.segment !== f.activeSegment) return false;
+    if (f.query && !(p.address || '').toLowerCase().includes(f.query.toLowerCase()) && !p.title.toLowerCase().includes(f.query.toLowerCase())) return false;
+    const n = this.priceNum(p);
+    if (f.priceMin && n < parseFloat(f.priceMin)) return false;
+    if (f.priceMax && n > parseFloat(f.priceMax)) return false;
+    return true;
+  }
+  saveCurrentSearch() {
+    if (!this.state.user) { this.openAuth('login'); return; }
+    const list = this.loadSavedSearches();
+    const snap = this.currentFilterSnapshot();
+    list.unshift({ id: 's' + Date.now(), filters: snap, alertsOn: true });
+    this.saveSavedSearches(list);
+    this.setState({ savedSearchesOpen: true });
+  }
+  deleteSavedSearch(id) {
+    this.saveSavedSearches(this.loadSavedSearches().filter(s => s.id !== id));
+  }
+  toggleSavedSearchAlert(id) {
+    this.saveSavedSearches(this.loadSavedSearches().map(s => s.id === id ? { ...s, alertsOn: !s.alertsOn } : s));
+  }
+  applySavedSearch(f) {
+    this.setState({
+      view: 'results', query: f.query, activeSegment: f.activeSegment, beds: f.beds, baths: f.baths,
+      operation: f.operation, priceMin: f.priceMin, priceMax: f.priceMax, sizeMin: f.sizeMin, sizeMax: f.sizeMax,
+      selectedAmenities: f.selectedAmenities || [], visibleCount: this.PAGE_SIZE, savedSearchesOpen: false
+    });
+  }
+  openSavedSearches() { if (!this.state.user) { this.openAuth('login'); return; } this.setState({ savedSearchesOpen: true }); }
+  closeSavedSearches() { this.setState({ savedSearchesOpen: false }); }
+  openInbox() { if (!this.state.user) { this.openAuth('login'); return; } this.setState({ inboxOpen: true }); }
+  closeInbox() { this.setState({ inboxOpen: false }); }
+  openAlerts() { this.openSavedSearches(); }
+
+  scoreClass(score) { return score >= 80 ? 'tag-accent' : 'tag-outline'; }
+
+  icon(name) {
+    return name;
+  }
+
+  buildSpecs(p) {
+    const flags = { isArea: false, isConstr: false, isBano: false, isEstac: false, isRec: false, isAntig: false };
+    const base = [{ ...flags, isArea: true, label: p.size + ' terreno' }];
+    if (p.segment === 'Residencial') {
+      return [
+        ...base,
+        { ...flags, isConstr: true, label: (p.construccion || p.size) + ' constr.' },
+        { ...flags, isBano: true, label: (p.banos || 3) + ' baños' },
+        { ...flags, isEstac: true, label: (p.estacionamientos || 2) + ' estac.' },
+        { ...flags, isRec: true, label: (p.recamaras || 3) + ' rec.' },
+        { ...flags, isAntig: true, label: p.antiguedad || 'Usada' }
+      ];
+    }
+    if (p.segment === 'Comercial') return [...base, { ...flags, isConstr: true, label: (p.construccion || p.size) + ' constr.' }, { ...flags, isBano: true, label: (p.banos || 2) + ' baños' }, { ...flags, isEstac: true, label: (p.estacionamientos || 4) + ' estac.' }];
+    if (p.segment === 'Industrial') return [...base, { ...flags, isConstr: true, label: (p.construccion || p.size) + ' constr.' }, { ...flags, isEstac: true, label: (p.docks || 2) + ' dock doors' }];
+    return base;
+  }
+
+  renderVals() {
+    if (!this.allProperties.length && window.AHProperties) this.allProperties = window.AHProperties.load();
+    const segNames = ['Todos', 'Residencial', 'Comercial', 'Industrial', 'Terrenos', 'Ranchos', 'Desarrollos'];
+    const active = this.state.activeSegment;
+    const segments = segNames.filter(n => n !== 'Todos' || this.state.view === 'results').map(name => ({
+      name,
+      tagClass: name === active ? 'tag-accent' : 'tag-outline',
+      onClick: () => { this.setSegment(name); this.closeDropdowns(); },
+      onSearchClick: () => this.searchSegment(name),
+      rowStyle: `padding:9px 10px; font-size:13px; cursor:pointer; font-weight:${name === active ? 700 : 400}; background:${name === active ? 'var(--color-neutral-100)' : 'transparent'};`
+    }));
+
+    const propertyTypeMap = {
+      Residencial: ['Casa', 'Departamento', 'Casa en condominio', 'Terreno residencial'],
+      Comercial: ['Local comercial', 'Oficina', 'Edificio comercial'],
+      Industrial: ['Nave industrial', 'Bodega', 'Terreno industrial'],
+      Terrenos: ['Terreno urbano', 'Terreno rústico'],
+      Ranchos: ['Rancho', 'Huerta', 'Parcela'],
+      Desarrollos: ['Desarrollo residencial', 'Desarrollo mixto', 'Lotes con servicios']
+    };
+    const showPropertyTypeFilter = active !== 'Todos';
+    const propertyTypeOptions = propertyTypeMap[active] || [];
+    const operationOptions = ['Comprar', 'Rentar'].map(label => ({
+      label,
+      onClick: () => this.setOperation(label),
+      rowStyle: `padding:9px 10px; font-size:13px; cursor:pointer; font-weight:${label === this.state.operation ? 700 : 400}; background:${label === this.state.operation ? 'var(--color-neutral-100)' : 'transparent'};`
+    }));
+
+    const operationTabs = ['Rentar', 'Comprar', 'Desarrollos', 'Remate'].map(label => ({
+      label,
+      onClick: () => this.setOperation(label),
+      style: `flex:1; text-align:center; padding:14px 0; font-size:13.5px; font-weight:${label === this.state.operation ? 700 : 400}; cursor:pointer; border-bottom:2px solid ${label === this.state.operation ? 'var(--color-text)' : 'transparent'};`
+    }));
+
+    const ddBtnStyle = (open) => `height:38px; border:1px solid ${open ? 'var(--color-text)' : 'var(--color-divider)'}; border-radius:19px; padding:0 12px; display:flex; align-items:center; gap:4px; font-size:12px; white-space:nowrap; cursor:pointer; flex:none;`;
+    const openDD = this.state.openDD;
+    const dd = {
+      top: this.state.ddTop || 0, left: this.state.ddLeft || 0,
+      opOpen: openDD === 'op', opBtnStyle: ddBtnStyle(openDD === 'op'), opChevron: openDD === 'op' ? '⌃' : '⌄',
+      ptypeOpen: openDD === 'ptype', ptypeBtnStyle: ddBtnStyle(openDD === 'ptype'), ptypeChevron: openDD === 'ptype' ? '⌃' : '⌄',
+      segmentOpen: openDD === 'segment', segmentBtnStyle: ddBtnStyle(openDD === 'segment'), segmentChevron: openDD === 'segment' ? '⌃' : '⌄',
+      priceOpen: openDD === 'price', priceBtnStyle: ddBtnStyle(openDD === 'price'), priceChevron: openDD === 'price' ? '⌃' : '⌄',
+      bedsOpen: openDD === 'beds', bedsBtnStyle: ddBtnStyle(openDD === 'beds'), bedsChevron: openDD === 'beds' ? '⌃' : '⌄',
+      sizeOpen: openDD === 'size', sizeBtnStyle: ddBtnStyle(openDD === 'size'), sizeChevron: openDD === 'size' ? '⌃' : '⌄',
+      segFieldOpen: openDD === 'segField', segFieldBtnStyle: ddBtnStyle(openDD === 'segField'), segFieldChevron: openDD === 'segField' ? '⌃' : '⌄',
+      bathsOpen: openDD === 'baths', bathsBtnStyle: ddBtnStyle(openDD === 'baths'), bathsChevron: openDD === 'baths' ? '⌃' : '⌄',
+      amenOpen: openDD === 'amen', amenBtnStyle: ddBtnStyle(openDD === 'amen'), amenChevron: openDD === 'amen' ? '⌃' : '⌄'
+    };
+
+    const segmentFieldMap = {
+      Comercial: { label: 'Cap Rate', options: ['5% o más', '7% o más', '9% o más', 'Sin dato'] },
+      Industrial: { label: 'Altura libre', options: ['6m+', '8m+', '10m+', '12m+'] },
+      Terrenos: { label: 'Uso de suelo', options: ['Habitacional', 'Comercial', 'Industrial', 'Mixto'] },
+      Ranchos: { label: 'Vocación', options: ['Agrícola', 'Ganadera', 'Recreativa', 'Con cuerpos de agua'] },
+      Desarrollos: { label: 'Avance de obra', options: ['Preventa', 'En construcción', 'Entrega inmediata'] }
+    };
+    const segField = segmentFieldMap[active];
+    const showBedsFilter = active === 'Todos' || active === 'Residencial';
+    const showSegmentFieldFilter = !!segField;
+    const segmentFieldLabel = segField ? segField.label : '';
+    const segmentFieldOptions = segField ? segField.options : [];
+
+    const bedNames = ['Todas', '1+', '2+', '3+', '4+', '5+'];
+    const beds = this.state.beds;
+    const bedOptions = bedNames.map(label => ({
+      label,
+      onClick: () => this.setBeds(label),
+      style: `padding:7px 12px; font-size:12.5px; border:1px solid ${label === beds ? 'var(--color-text)' : 'var(--color-divider)'}; background:${label === beds ? 'var(--color-text)' : 'transparent'}; color:${label === beds ? '#fff' : 'var(--color-text)'}; cursor:pointer;`
+    }));
+
+    const bathNames = ['Todos', '1+', '2+', '3+', '4+'];
+    const baths = this.state.baths;
+    const bathOptions = bathNames.map(label => ({
+      label,
+      onClick: () => this.setBaths(label),
+      style: `padding:7px 12px; font-size:12.5px; border:1px solid ${label === baths ? 'var(--color-text)' : 'var(--color-divider)'}; background:${label === baths ? 'var(--color-text)' : 'transparent'}; color:${label === baths ? '#fff' : 'var(--color-text)'}; cursor:pointer;`
+    }));
+
+    const sortNames = ['Score', 'Precio', 'Más reciente'];
+    const sort = this.state.sort;
+    const sortOptions = sortNames.map(name => ({
+      name,
+      tagClass: name === sort ? 'tag-accent' : 'tag-outline',
+      onClick: () => this.setSort(name),
+      style: `font-size:12px; padding:8px 12px; cursor:pointer; font-weight:${name === sort ? 700 : 400}; background:${name === sort ? 'var(--color-text)' : 'transparent'}; color:${name === sort ? '#fff' : 'var(--color-text)'};`
+    }));
+
+    let list = active === 'Todos' ? this.allProperties : this.allProperties.filter(p => p.segment === active);
+    const q = (this.state.query || '').trim().toLowerCase();
+    if (q) list = list.filter(p => p.address.toLowerCase().includes(q) || p.title.toLowerCase().includes(q));
+    if (beds !== 'Todas') list = list.filter(p => p.recamaras >= parseInt(beds));
+    if (baths !== 'Todos') list = list.filter(p => p.banos >= parseInt(baths));
+    const pMin = parseFloat(this.state.priceMin);
+    const pMax = parseFloat(this.state.priceMax);
+    if (!isNaN(pMin)) list = list.filter(p => this.priceNum(p) >= pMin);
+    if (!isNaN(pMax)) list = list.filter(p => this.priceNum(p) <= pMax);
+    const sMin = parseFloat(this.state.sizeMin);
+    const sMax = parseFloat(this.state.sizeMax);
+    if (!isNaN(sMin)) list = list.filter(p => this.sizeNum(p) >= sMin);
+    if (!isNaN(sMax)) list = list.filter(p => this.sizeNum(p) <= sMax);
+    if (this.state.selectedAmenities.length) list = list.filter(p => this.state.selectedAmenities.every(a => (p.amenidades || []).includes(a)));
+    const b = this.state.showMap ? this.state.mapBounds : null;
+    if (b) list = list.filter(p => p.lat >= b.south && p.lat <= b.north && p.lng >= b.west && p.lng <= b.east);
+    if (sort === 'Score') list = [...list].sort((a, b) => b.score - a.score);
+    if (sort === 'Precio') list = [...list].sort((a, b) => parseFloat(a.price.replace(/[^0-9.]/g, '')) - parseFloat(b.price.replace(/[^0-9.]/g, '')));
+
+    const totalCount = list.length;
+    const visibleCount = Math.min(this.state.visibleCount, totalCount);
+    const hasMore = visibleCount < totalCount;
+    list = list.slice(0, visibleCount);
+
+    const selId = this.state.selectedId;
+    const favorites = this.state.favorites;
+    const properties = list.map(p => ({
+      ...p,
+      scoreTagClass: this.scoreClass(p.score),
+      rowStyle: `background:var(--color-bg); cursor:pointer; ${p.title === selId ? 'outline:2px solid var(--color-text); outline-offset:-2px;' : ''}`,
+      onSelect: () => this.selectProperty(p),
+      isFavorite: favorites.includes(p.title),
+      favIconStroke: favorites.includes(p.title) ? 'var(--color-accent)' : 'var(--color-text)',
+      favIconFill: favorites.includes(p.title) ? 'var(--color-accent)' : 'none',
+      onToggleFavorite: (e) => { e.stopPropagation(); this.toggleFavorite(p.title); },
+      leadMessage: `Hola, me interesa "${p.title}". ¿Podríamos platicar más detalles?`
+    }));
+
+    const selected = selId ? properties.find(p => p.title === selId) : null;
+    if (selected) selected.specs = this.buildSpecs(selected);
+
+    const showMap = this.state.showMap;
+    const mapToggleStyle = `display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:8px 14px; border:2px solid var(--color-text); cursor:pointer; white-space:nowrap; background:${showMap ? 'var(--color-text)' : 'transparent'}; color:${showMap ? '#fff' : 'var(--color-text)'};`;
+    const gridStyle = `flex:1; min-width:0; overflow-y:auto; display:grid; grid-template-columns:repeat(${showMap ? 2 : 3},1fr); gap:20px; padding:20px 24px; align-content:start;`;
+
+    const zoneNames = this.state.zoneOverrides || this.computeTopZones().map(z => z.zone);
+    const propsByZone = {};
+    this.allProperties.forEach(p => { const z = p.address.split(',')[0].trim(); (propsByZone[z] = propsByZone[z] || []).push(p); });
+    const expandedZone = this.state.expandedZone;
+    const topZones = zoneNames.map(name => {
+      const zoneProps = propsByZone[name] || [];
+      const avgScore = zoneProps.length ? Math.round(zoneProps.reduce((s, p) => s + p.score, 0) / zoneProps.length) : 0;
+      const expanded = name === expandedZone;
+      return {
+        name, count: zoneProps.length, expanded,
+        chevron: expanded ? '⌃' : '⌄',
+        onClick: () => this.toggleZone(name),
+        avgScore,
+        topProps: zoneProps.slice(0, 3).map(p => ({ title: p.title, price: p.price, size: p.size })),
+        onSearch: () => this.searchZone2(name)
+      };
+    });
+    const zoneDraftFields = this.state.editingZones ? (this.state.zoneDraft || []).map((val, i) => ({
+      value: val,
+      onChange: (e) => this.setZoneDraft(i, e.target.value)
+    })) : [];
+
+    return {
+      segments, sortOptions, properties, count: totalCount, noResults: totalCount === 0,
+      topZones, editingZones: this.state.editingZones, zoneDraftFields,
+      startEditZones: () => this.startEditZones(),
+      saveZones: () => this.saveZones(),
+      cancelEditZones: () => this.cancelEditZones(),
+      resetZonesAuto: () => this.resetZonesAuto(),
+      hasHeroImage: !!this.state.heroImage,
+      heroBgStyle: this.state.heroImage ? `position:absolute; inset:0; background-image:url("${this.state.heroImage}"); background-size:cover; background-position:center;` : 'display:none;',
+      hasZoneOverride: !!this.state.zoneOverrides,
+      notEditingZones: !this.state.editingZones,
+      user: this.state.user,
+      isLoggedIn: !!this.state.user,
+      notLoggedIn: !this.state.user,
+      openLogin: () => this.openAuth('login'),
+      openRegister: () => this.openAuth('register'),
+      authOpen: this.state.authOpen,
+      authIsLogin: this.state.authMode === 'login',
+      authNotLogin: this.state.authMode !== 'login',
+      authTitle: this.state.authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta',
+      authSubmitLabel: this.state.authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta',
+      authSwitchLabel: this.state.authMode === 'login' ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión',
+      authName: this.state.authName,
+      authEmail: this.state.authEmail,
+      authPhone: this.state.authPhone,
+      authZone: this.state.authZone,
+      authPassword: this.state.authPassword,
+      onAuthName: (e) => this.setState({ authName: e.target.value }),
+      onAuthEmail: (e) => this.setState({ authEmail: e.target.value }),
+      onAuthPhone: (e) => this.setState({ authPhone: e.target.value }),
+      onAuthZone: (e) => this.setState({ authZone: e.target.value }),
+      onAuthPassword: (e) => this.setState({ authPassword: e.target.value }),
+      closeAuth: () => this.closeAuth(),
+      switchAuthMode: () => this.switchAuthMode(),
+      submitAuth: () => this.submitAuth(),
+      userMenuOpen: this.state.userMenuOpen,
+      toggleUserMenu: () => this.toggleUserMenu(),
+      logout: () => this.logout(),
+
+      openFavorites: () => this.openFavorites(),
+      closeFavorites: () => this.closeFavorites(),
+      favoritesOpen: this.state.favoritesOpen,
+      favoritedProperties: this.allProperties.filter(p => this.state.favorites.includes(p.title)).map(p => ({ ...p, scoreTagClass: this.scoreClass(p.score) })),
+      hasFavorites: this.state.favorites.length > 0,
+      noFavorites: this.state.favorites.length === 0,
+      openComingSoon: (label) => this.openComingSoon(label),
+      closeComingSoon: () => this.closeComingSoon(),
+      comingSoon: this.state.comingSoon,
+      comingSoonOpen: !!this.state.comingSoon,
+      saveCurrentSearch: () => this.saveCurrentSearch(),
+      openAlerts: () => this.openAlerts(),
+      openSavedSearches: () => this.openSavedSearches(),
+      closeSavedSearches: () => this.closeSavedSearches(),
+      savedSearchesOpen: this.state.savedSearchesOpen,
+      savedSearchList: this.loadSavedSearches().map(s => ({
+        id: s.id, label: this.filterLabel(s.filters), alertsOn: s.alertsOn,
+        matchCount: this.allProperties.filter(p => this.matchFilter(p, s.filters)).length,
+        onApply: () => this.applySavedSearch(s.filters),
+        onToggleAlert: () => this.toggleSavedSearchAlert(s.id),
+        onDelete: () => this.deleteSavedSearch(s.id)
+      })),
+      hasSavedSearches: this.loadSavedSearches().length > 0,
+      noSavedSearches: this.loadSavedSearches().length === 0,
+      openInbox: () => this.openInbox(),
+      closeInbox: () => this.closeInbox(),
+      inboxOpen: this.state.inboxOpen,
+      messageList: this.loadMessages(),
+      hasMessages: this.loadMessages().length > 0,
+      noMessages: this.loadMessages().length === 0,
+      hasUnreadMessages: this.loadMessages().length > 0,
+      unreadMessagesCount: this.loadMessages().length,
+      contactName: this.state.contactName, onContactName: (e) => this.setState({ contactName: e.target.value }),
+      contactPhone: this.state.contactPhone, onContactPhone: (e) => this.setState({ contactPhone: e.target.value }),
+      contactMessage: this.state.contactMessage, onContactMessage: (e) => this.setState({ contactMessage: e.target.value }),
+      contactSent: this.state.contactSent,
+      submitContact: () => this.submitContact(),
+
+      budgetMinVal: this.state.budgetMin,
+      budgetMaxVal: this.state.budgetMax,
+      onBudgetMinRange: (e) => this.setBudgetMin(e.target.value),
+      onBudgetMaxRange: (e) => this.setBudgetMax(e.target.value),
+      onBudgetMinInput: (e) => this.setBudgetMin(e.target.value),
+      onBudgetMaxInput: (e) => this.setBudgetMax(e.target.value),
+      applyBudget: () => this.applyBudget(),
+      budgetFillStyle: `position:absolute; top:0; bottom:0; left:${(this.state.budgetMin / this.BUDGET_CAP) * 100}%; right:${100 - (this.state.budgetMax / this.BUDGET_CAP) * 100}%; background:var(--color-text);`,
+      budgetHistogram: (() => {
+        const buckets = 18;
+        const counts = new Array(buckets).fill(0);
+        this.allProperties.forEach(p => {
+          const n = Math.min(this.priceNum(p), this.BUDGET_CAP);
+          const idx = Math.min(buckets - 1, Math.floor((n / this.BUDGET_CAP) * buckets));
+          counts[idx]++;
+        });
+        const max = Math.max(...counts, 1);
+        return counts.map((c, i) => {
+          const bucketMin = (i / buckets) * this.BUDGET_CAP;
+          const inRange = bucketMin >= this.state.budgetMin && bucketMin <= this.state.budgetMax;
+          return { h: 6 + (c / max) * 34, style: `background:${inRange ? 'var(--color-text)' : 'var(--color-neutral-300)'};` };
+        });
+      })(),
+      guestRecs: this.allProperties.filter(p => { const n = this.priceNum(p); return n >= this.state.appliedMin && n <= this.state.appliedMax; }).sort((a, b) => b.score - a.score).slice(0, 3).map(p => ({ ...p, scoreTagClass: this.scoreClass(p.score) })),
+      hasGuestRecs: !this.state.user,
+      budgetMinLabel: this.state.budgetMin <= 0 ? '$0' : `$${this.state.budgetMin}M`,
+      budgetMaxLabel: this.state.budgetMax >= this.BUDGET_CAP ? '$20M+' : `$${this.state.budgetMax}M`,
+      hasMore, onGridScroll: (e) => this.onGridScroll(e),
+      mapRef: this.mapRef,
+      showMap, mapToggleStyle, gridStyle,
+      mapToggleLabel: showMap ? 'Ocultar mapa' : 'Ver mapa',
+      toggleMap: () => this.toggleMap(),
+      isHome: this.state.view === 'home',
+      isResults: this.state.view === 'results',
+      activeSegmentLabel: active === 'Todos' ? 'Todos los segmentos' : active,
+      query: this.state.query,
+      onQueryChange: (e) => this.setState({ query: e.target.value }),
+      submitSearch: () => this.submitSearch(),
+      goHome: () => this.goHome(),
+      goToMapSearch: () => this.goToMapSearch(),
+      searchZone: (e) => { e.preventDefault(); this.submitSearch(); },
+      dd,
+      toggleSegmentDD: (e) => this.toggleDD('segment', e),
+      togglePriceDD: (e) => this.toggleDD('price', e),
+      toggleBedsDD: (e) => this.toggleDD('beds', e),
+      toggleSizeDD: (e) => this.toggleDD('size', e),
+      toggleSegFieldDD: (e) => this.toggleSegFieldDD(e),
+      toggleBathsDD: (e) => this.toggleBathsDD(e),
+      toggleAmenDD: (e) => this.toggleAmenDD(e),
+      toggleOpDD: (e) => this.toggleOpDD(e),
+      togglePtypeDD: (e) => this.togglePtypeDD(e),
+      operationLabel: this.state.operation,
+      operationOptions,
+      operationTabs,
+      showPropertyTypeFilter, propertyTypeOptions,
+      bathOptions,
+      amenities: this.amenities,
+      showBedsFilter, showSegmentFieldFilter, segmentFieldLabel, segmentFieldOptions,
+      closeDropdowns: () => this.closeDropdowns(),
+      bedOptions,
+      priceMin: this.state.priceMin, priceMax: this.state.priceMax,
+      onPriceMin: (e) => this.setPriceMin(e.target.value), onPriceMax: (e) => this.setPriceMax(e.target.value),
+      fPriceMin: this.state.fPriceMin, fPriceMax: this.state.fPriceMax,
+      onFPriceMinRange: (e) => this.setFPriceMin(e.target.value), onFPriceMaxRange: (e) => this.setFPriceMax(e.target.value),
+      applyFPrice: () => this.applyFPrice(),
+      fPriceFillStyle: `position:absolute; top:0; bottom:0; left:${(this.state.fPriceMin / this.BUDGET_CAP) * 100}%; right:${100 - (this.state.fPriceMax / this.BUDGET_CAP) * 100}%; background:var(--color-text);`,
+      fPriceMinLabel: this.state.fPriceMin <= 0 ? '$0' : `$${this.state.fPriceMin}M`,
+      fPriceMaxLabel: this.state.fPriceMax >= this.BUDGET_CAP ? '$20M+' : `$${this.state.fPriceMax}M`,
+      fPriceHistogram: (() => {
+        const buckets = 16;
+        const counts = new Array(buckets).fill(0);
+        this.allProperties.forEach(p => {
+          const n = Math.min(this.priceNum(p), this.BUDGET_CAP);
+          const idx = Math.min(buckets - 1, Math.floor((n / this.BUDGET_CAP) * buckets));
+          counts[idx]++;
+        });
+        const max = Math.max(...counts, 1);
+        return counts.map((c, i) => {
+          const bucketMin = (i / buckets) * this.BUDGET_CAP;
+          const inRange = bucketMin >= this.state.fPriceMin && bucketMin <= this.state.fPriceMax;
+          return { h: 5 + (c / max) * 28, style: `background:${inRange ? 'var(--color-text)' : 'var(--color-neutral-300)'};` };
+        });
+      })(),
+      sizeMin: this.state.sizeMin, sizeMax: this.state.sizeMax,
+      onSizeMin: (e) => this.setSizeMin(e.target.value), onSizeMax: (e) => this.setSizeMax(e.target.value),
+      amenityOptions: this.amenities.map(name => ({ name, checked: this.state.selectedAmenities.includes(name), onToggle: () => this.toggleAmenity(name) })),
+      selected,
+      closeSelected: () => this.closeSelected(),
+      stopClose: (e) => e.stopPropagation(),
+      contactOpen: this.state.contactOpen,
+      notContactOpen: !this.state.contactOpen,
+      openContact: () => this.openContact(),
+      closeContact: () => this.closeContact(),
+      waLink: 'https://wa.me/524441234567'
+    };
+  }
+}
+
+</script>
+</body>
+</html>

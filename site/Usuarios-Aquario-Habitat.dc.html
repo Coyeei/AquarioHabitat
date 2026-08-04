@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/styles.css">
+  <script src="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/_ds_bundle.js"></script>
+  <style>
+    :root {
+      --color-accent: var(--color-text); --color-accent-100: var(--color-neutral-100); --color-accent-200: var(--color-neutral-200); --color-accent-300: var(--color-neutral-300);
+      --color-accent-600: #000; --color-accent-700: var(--color-text); --color-accent-800: var(--color-neutral-800);
+      --color-accent-2-100: var(--color-neutral-100); --color-accent-2-800: var(--color-neutral-800);
+    }
+    :root[data-theme="dark"] {
+      --color-bg: #121212; --color-surface: #1c1c1c; --color-text: #f2f0ef; --color-divider: rgba(255,255,255,0.18);
+      --color-neutral-100: #242424; --color-neutral-200: #2e2e2e; --color-neutral-300: #3a3a3a;
+      --color-neutral-600: #a3a3a3; --color-neutral-700: #c4c4c4; --color-neutral-800: #e0e0e0; --color-neutral-900: #f5f5f5;
+      --color-accent-600: #fff;
+    }
+    html, body { margin: 0; height: 100%; background: var(--color-bg); }
+    * { box-sizing: border-box; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: var(--color-neutral-300); }
+  </style>
+</helmet>
+
+<div style="font-family: var(--font-body); color: var(--color-text); height:100vh; display:flex; flex-direction:column;" lang="es">
+
+  <!-- TOP NAV -->
+  <div style="flex:none; height:64px; border-bottom:2px solid var(--color-divider); display:flex; align-items:center; justify-content:space-between; padding:0 24px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <img src="./assets/logo-aquario-habitat.png" alt="Aquario Habitat" style="height:26px; width:26px; object-fit:contain;">
+      <div style="font-family:var(--font-heading); font-weight:800; font-size:13px; letter-spacing:0.03em;">AQUARIO HABITAT</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="tag tag-neutral" style="font-size:11px;">San Luis Potosí</div>
+      <a href="Perfil-Aquario-Habitat.dc.html" style="width:32px; height:32px; border-radius:50%; background:var(--color-neutral-200); display:flex; align-items:center; justify-content:center; font-family:var(--font-heading); font-weight:800; font-size:12px; color:var(--color-text); text-decoration:none;">DS</a>
+      <a href="Login-Aquario-Habitat.dc.html" style="font-size:11.5px; padding:6px 12px; text-decoration:none; color:var(--color-text); border:1px solid var(--color-divider); font-family:var(--font-heading); font-weight:700;" style-hover="border-color:var(--color-text);">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div style="flex:1; min-height:0; display:flex;">
+
+    <!-- SIDEBAR -->
+    <div style="width:200px; flex:none; border-right:2px solid var(--color-divider); padding:20px 0;">
+      <a href="Dashboard-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Propiedades</a>
+      <a href="Panel-Datos-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Fuentes</a>
+      <a href="Alertas-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Alertas</a>
+      <a href="Perfil-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Perfil</a>
+      <div class="nav-item" style="padding:10px 20px; font-size:13.5px; font-weight:700; border-left:3px solid var(--color-accent);">Usuarios</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div style="flex:1; min-width:0; overflow-y:auto; padding:28px 32px;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:22px;">Usuarios registrados</div>
+        <div style="font-size:12.5px; color:var(--color-neutral-600);">{{ count }} cuentas del sitio público</div>
+      </div>
+      <div style="font-size:13px; color:var(--color-neutral-600); margin-bottom:24px;">Personas que crearon cuenta en el sitio público para guardar favoritos, búsquedas y alertas.</div>
+
+      <sc-if value="{{ hasUsers }}" hint-placeholder-val="{{ true }}">
+        <table class="table" style="width:100%;">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Zona de interés</th>
+              <th>Fecha de registro</th>
+              <th>Última actividad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ users }}" as="u" hint-placeholder-count="5">
+              <tr>
+                <td style="font-weight:700;">{{ u.name }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.phone }}</td>
+                <td>{{ u.zone }}</td>
+                <td>{{ u.registeredAtLabel }}</td>
+                <td>{{ u.lastActivityLabel }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </sc-if>
+      <sc-if value="{{ hasNoUsers }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px solid var(--color-divider); padding:40px; text-align:center; color:var(--color-neutral-600); font-size:13.5px;">Todavía no hay usuarios registrados desde el sitio público.</div>
+      </sc-if>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    window.addEventListener('storage', this.onStorage = () => this.forceUpdate());
+  }
+  componentWillUnmount() {
+    window.removeEventListener('storage', this.onStorage);
+  }
+
+  loadUsers() {
+    try {
+      const raw = localStorage.getItem('ah-registered-users');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  fmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  renderVals() {
+    const raw = this.loadUsers().slice().sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt));
+    const users = raw.map(u => ({
+      ...u,
+      registeredAtLabel: this.fmtDate(u.registeredAt),
+      lastActivityLabel: this.fmtDate(u.lastActivity)
+    }));
+    return {
+      users,
+      count: users.length,
+      hasUsers: users.length > 0,
+      hasNoUsers: users.length === 0
+    };
+  }
+}
+
+</script>
+</body>
+</html>

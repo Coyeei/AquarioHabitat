@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/styles.css">
+  <script src="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/_ds_bundle.js"></script>
+  <script src="./image-slot.js"></script>
+  <style>
+    :root {
+      --color-accent: var(--color-text); --color-accent-100: var(--color-neutral-100); --color-accent-200: var(--color-neutral-200); --color-accent-300: var(--color-neutral-300);
+      --color-accent-600: #000; --color-accent-700: var(--color-text); --color-accent-800: var(--color-neutral-800);
+      --color-accent-2-100: var(--color-neutral-100); --color-accent-2-800: var(--color-neutral-800);
+    }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--color-bg); }
+    a { color: var(--color-text); }
+    a:hover { color: var(--color-neutral-700); }
+    .aw { max-width: 1280px; margin: 0 auto; padding: 0 48px; }
+    .seg-row { display:grid; grid-template-columns: 1fr 1fr; gap:80px; align-items:center; }
+    .seg-row.rev { grid-template-columns: 1fr 1fr; }
+    .seg-row.rev .seg-text { order: 2; }
+    .seg-row.rev .seg-img { order: 1; }
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr !important; }
+      .seg-row, .seg-row.rev { grid-template-columns: 1fr !important; }
+      .seg-row.rev .seg-text, .seg-row.rev .seg-img { order: initial !important; }
+      .mod-grid { grid-template-columns: 1fr !important; }
+      .nav-links { display: none !important; }
+      .aw { padding: 0 24px; }
+      h1 { font-size: 44px !important; }
+    }
+  </style>
+</helmet>
+
+<div style="font-family: var(--font-body); color: var(--color-text); overflow-x:hidden;" lang="es">
+
+  <!-- NAV -->
+  <div style="position: fixed; top:0; left:0; right:0; z-index: 20; background:var(--color-bg); border-bottom:2px solid var(--color-divider);">
+    <div class="aw" style="display:flex; align-items:center; justify-content:space-between; height:80px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <img src="./assets/logo-aquario-habitat.png" alt="Aquario Habitat" style="height:30px; width:30px; object-fit:contain;">
+        <div style="font-family: var(--font-heading); font-weight:800; font-size:14px; letter-spacing:0.04em; color:var(--color-text); line-height:1.1;">AQUARIO HABITAT<br><span style="font-weight:600; font-size:10px; letter-spacing:0.1em; opacity:0.7;">REAL ESTATE</span></div>
+      </div>
+      <div class="nav-links" style="display:flex; gap:40px; font-size:13px; font-weight:600; letter-spacing:0.03em; color:var(--color-text);">
+        <a href="#segmentos" style="text-decoration:none; color:var(--color-text);">SEGMENTOS</a>
+        <a href="#modulos" style="text-decoration:none; color:var(--color-text);">PRODUCTO</a>
+        <a href="#cobertura" style="text-decoration:none; color:var(--color-text);">COBERTURA</a>
+      </div>
+      <a href="#acceso" style="text-decoration:none; color:var(--color-text); font-size:13px; font-weight:700; letter-spacing:0.03em; border-bottom:2px solid var(--color-text); padding-bottom:2px;">ACCESO →</a>
+    </div>
+  </div>
+
+  <!-- HERO: full-bleed cinematic -->
+  <div style="position:relative; width:100%; height:100vh; min-height:720px;">
+    <image-slot id="hero-full" shape="rect" placeholder="Fotografía cinemática — skyline / desarrollo / terreno" style="position:absolute; inset:0; width:100%; height:100%;"></image-slot>
+    <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.55) 100%); pointer-events:none;"></div>
+    <div class="aw" style="position:absolute; left:0; right:0; bottom:0; height:34vh; min-height:360px; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom:56px;">
+      <h1 style="font-family:var(--font-heading); font-weight:800; font-size:clamp(34px,5.5vh,52px); line-height:1.08; letter-spacing:-0.02em; color:#fff; margin:0 0 18px; max-width:12ch;">Todo el mercado inmobiliario. Un solo lugar.</h1>
+      <p style="font-size:clamp(14px,2vh,17px); line-height:1.5; color:rgba(255,255,255,0.85); max-width:42ch; margin:0;">Residencial, comercial, industrial, terrenos, ranchos y desarrollos — cruzados, valuados y explicados por un analista inteligente.</p>
+    </div>
+  </div>
+
+  <!-- SEGMENTOS: alternating full-bleed rows -->
+  <div id="segmentos">
+    <div class="aw" style="padding-top:40px; padding-bottom:24px;">
+      <div style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--color-neutral-700); font-weight:700;"><span style="display:inline-block;width:6px;height:6px;background:var(--color-accent);border-radius:50%;margin-right:8px;vertical-align:middle;"></span>Cobertura</div>
+      <h2 style="font-family:var(--font-heading); font-weight:800; font-size:48px; letter-spacing:-0.01em; margin:12px 0 0; max-width:14ch;">Seis segmentos. Un mismo dato.</h2>
+    </div>
+
+    <div class="aw seg-row" style="padding:80px 48px;">
+      <div class="seg-text">
+        <div style="font-family:var(--font-heading); font-size:13px; color:var(--color-neutral-600); font-weight:700; letter-spacing:0.05em; margin-bottom:12px;">01 — RESIDENCIAL</div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:34px; margin-bottom:16px;">Casas y departamentos.</div>
+        <div style="font-size:16px; color:var(--color-neutral-700); max-width:38ch; line-height:1.6;">Valuados por zona y colonia, con comparables reales y nivel de confianza.</div>
+      </div>
+      <div class="seg-img"><image-slot id="seg-residencial" shape="rect" placeholder="Fotografía residencial" style="width:100%; aspect-ratio:4/3;"></image-slot></div>
+    </div>
+
+    <div class="aw seg-row rev" style="padding:80px 48px;">
+      <div class="seg-text">
+        <div style="font-family:var(--font-heading); font-size:13px; color:var(--color-neutral-600); font-weight:700; letter-spacing:0.05em; margin-bottom:12px;">02 — COMERCIAL</div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:34px; margin-bottom:16px;">Locales y oficinas.</div>
+        <div style="font-size:16px; color:var(--color-neutral-700); max-width:38ch; line-height:1.6;">Cap rate y NOI estimados para decidir con números, no con intuición.</div>
+      </div>
+      <div class="seg-img"><image-slot id="seg-comercial" shape="rect" placeholder="Fotografía comercial" style="width:100%; aspect-ratio:4/3;"></image-slot></div>
+    </div>
+
+    <div class="aw seg-row" style="padding:80px 48px;">
+      <div class="seg-text">
+        <div style="font-family:var(--font-heading); font-size:13px; color:var(--color-neutral-600); font-weight:700; letter-spacing:0.05em; margin-bottom:12px;">03 — INDUSTRIAL</div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:34px; margin-bottom:16px;">Naves y parques.</div>
+        <div style="font-size:16px; color:var(--color-neutral-700); max-width:38ch; line-height:1.6;">Altura libre, dock doors y potencia eléctrica — el detalle que otros portales omiten.</div>
+      </div>
+      <div class="seg-img"><image-slot id="seg-industrial" shape="rect" placeholder="Fotografía industrial" style="width:100%; aspect-ratio:4/3;"></image-slot></div>
+    </div>
+
+    <div class="aw seg-row rev" style="padding:80px 48px 120px;">
+      <div class="seg-text">
+        <div style="font-family:var(--font-heading); font-size:13px; color:var(--color-neutral-600); font-weight:700; letter-spacing:0.05em; margin-bottom:12px;">04 — TERRENOS Y RANCHOS</div>
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:34px; margin-bottom:16px;">Suelo, topografía, agua.</div>
+        <div style="font-size:16px; color:var(--color-neutral-700); max-width:38ch; line-height:1.6;">Uso de suelo, vocación agrícola y potencial de plusvalía, donde hoy no hay ningún equivalente mexicano.</div>
+      </div>
+      <div class="seg-img"><image-slot id="seg-terrenos" shape="rect" placeholder="Fotografía de terreno / rancho" style="width:100%; aspect-ratio:4/3;"></image-slot></div>
+    </div>
+  </div>
+
+  <!-- POSTER STATEMENT -->
+  <div style="background:var(--color-text);">
+    <div class="aw" style="padding:140px 48px; text-align:center;">
+      <div style="font-family:var(--font-heading); font-weight:800; font-size:52px; line-height:1.15; letter-spacing:-0.01em; color:#fff; max-width:22ch; margin:0 auto;">Ningún portal cubre bien los ocho segmentos. <span style="opacity:0.6;">Nosotros construimos el que sí.</span></div>
+    </div>
+  </div>
+
+  <!-- MODULOS -->
+  <div id="modulos" class="aw" style="padding:140px 48px;">
+    <div style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--color-neutral-700); font-weight:700;"><span style="display:inline-block;width:6px;height:6px;background:var(--color-accent);border-radius:50%;margin-right:8px;vertical-align:middle;"></span>Producto</div>
+    <h2 style="font-family:var(--font-heading); font-weight:800; font-size:48px; letter-spacing:-0.01em; margin:12px 0 72px; max-width:16ch;">No es un catálogo. Es un analista.</h2>
+
+    <div class="mod-grid" style="display:grid; grid-template-columns:1fr 1fr; column-gap:80px;">
+      <div style="padding:36px 0; border-top:2px solid var(--color-divider);">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:8px;">Valuación inteligente</div>
+        <div style="font-size:15px; color:var(--color-neutral-700); line-height:1.6;">Valor estimado, rango y nivel de confianza por propiedad, comparado contra el mercado real.</div>
+      </div>
+      <div style="padding:36px 0; border-top:2px solid var(--color-divider);">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:8px;">Motor de oportunidades</div>
+        <div style="font-size:15px; color:var(--color-neutral-700); line-height:1.6;">Opportunity Score: precio, ubicación, plusvalía y liquidez en un solo indicador.</div>
+      </div>
+      <div style="padding:36px 0; border-top:2px solid var(--color-divider);">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:8px;">Mapa inteligente</div>
+        <div style="font-size:15px; color:var(--color-neutral-700); line-height:1.6;">Zonas caras, emergentes y subvaluadas, por estado, ciudad y colonia.</div>
+      </div>
+      <div style="padding:36px 0; border-top:2px solid var(--color-divider);">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:8px;">Alertas inteligentes</div>
+        <div style="font-size:15px; color:var(--color-neutral-700); line-height:1.6;">Avisos casi en tiempo real cuando aparece una propiedad que cumple tus criterios.</div>
+      </div>
+      <div style="padding:36px 0; border-top:2px solid var(--color-divider); border-bottom:2px solid var(--color-divider);">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:8px;">Analista IA</div>
+        <div style="font-size:15px; color:var(--color-neutral-700); line-height:1.6;">Pregunta "¿esta propiedad está cara?" y recibe una respuesta razonada, con datos.</div>
+      </div>
+      <div style="padding:36px 0; border-top:2px solid var(--color-divider); border-bottom:2px solid var(--color-divider);">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:8px;">Panel de datos</div>
+        <div style="font-size:15px; color:var(--color-neutral-700); line-height:1.6;">Administración de fuentes, calidad de datos y convenios con aliados.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COBERTURA / COMPARATIVO -->
+  <div id="cobertura" style="position:relative; min-height:80vh; display:flex; align-items:center;">
+    <image-slot id="cobertura-bg" shape="rect" placeholder="Fotografía — mapa de México / skyline nocturno" style="position:absolute; inset:0; width:100%; height:100%;"></image-slot>
+    <div style="position:absolute; inset:0; background:rgba(0,0,0,0.5); pointer-events:none;"></div>
+    <div class="aw" style="position:relative; padding:96px 48px;">
+      <div style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.7); font-weight:700; margin-bottom:20px;"><span style="display:inline-block;width:6px;height:6px;background:var(--color-accent);border-radius:50%;margin-right:8px;vertical-align:middle;"></span>Por qué ahora</div>
+      <h2 style="font-family:var(--font-heading); font-weight:800; font-size:42px; color:#fff; letter-spacing:-0.01em; margin:0 0 24px; max-width:18ch;">El hueco que nadie ha cerrado.</h2>
+      <p style="font-size:17px; line-height:1.65; color:rgba(255,255,255,0.85); max-width:64ch;">Inmuebles24, Vivanuncios y Lamudi cubren bien vivienda, pero se quedan cortos en industrial y prácticamente ausentes en ranchos y terrenos. En EE.UU. el mercado está fragmentado por vertical — Zillow en residencial, LoopNet en comercial e industrial, Land.com en terrenos — y nadie lo unifica.</p>
+    </div>
+  </div>
+
+  <!-- ACCESO -->
+  <div id="acceso" style="background:var(--color-bg);">
+    <div class="aw" style="padding:120px 48px; text-align:center;">
+      <div style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--color-neutral-700); font-weight:700; margin-bottom:20px;"><span style="display:inline-block;width:6px;height:6px;background:var(--color-accent);border-radius:50%;margin-right:8px;vertical-align:middle;"></span>Acceso anticipado</div>
+      <h2 style="font-family:var(--font-heading); font-weight:800; font-size:44px; letter-spacing:-0.01em; margin:0 auto 40px; max-width:20ch;">Sé de los primeros en usar el analista inmobiliario de México.</h2>
+      <div style="display:flex; gap:0; max-width:460px; margin:0 auto; border-bottom:2px solid var(--color-text);">
+        <input class="input" type="email" placeholder="tu@correo.com" style="border:none; background:transparent; flex:1; height:56px; font-size:16px;">
+        <button class="btn btn-primary" style="border-radius:0; height:56px; flex:none;">Unirme</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="background:var(--color-bg); border-top:2px solid var(--color-divider);">
+    <div class="aw" style="padding:32px 48px; display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--color-neutral-600);">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <img src="./assets/logo-aquario-habitat.png" alt="Aquario Habitat" style="height:28px; width:28px; object-fit:contain;">
+        <div style="font-family:var(--font-heading); font-weight:800;">AQUARIO HABITAT REAL ESTATE</div>
+      </div>
+      <div>© 2026 · Inteligencia inmobiliaria para México</div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/styles.css">
+  <script src="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/_ds_bundle.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; background: var(--color-bg); }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="font-family: var(--font-body); color:var(--color-text); height:100vh; width:100vw; background:#fff; display:flex; flex-direction:row; align-items:center; overflow:auto;" lang="es">
+
+  <div style="flex:2; min-width:0; display:flex; align-items:center; justify-content:center; height:100%;">
+    <img src="./assets/logo-aquario-habitat.png" alt="Aquario Habitat" style="width:920px; height:920px; max-width:98%; max-height:98vh; object-fit:contain;">
+  </div>
+
+  <div style="flex:1; min-width:280px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; height:100%; padding:24px 80px 24px 0;">
+
+  <sc-if value="{{ isLogin }}">
+  <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:28px; text-align:center;">Iniciar sesión</div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+    <div class="field">
+      <label style="color:var(--color-text); font-size:12.5px;">Usuario</label>
+      <input class="input" type="text" placeholder="usuario" value="{{ email }}" onChange="{{ onEmailChange }}" style="height:38px; width:280px; font-size:15px; padding:0 2px; background:transparent; border:none; border-bottom:1px solid var(--color-neutral-300); color:var(--color-text);">
+    </div>
+    <div class="field">
+      <label style="color:var(--color-text); font-size:12.5px;">Contraseña</label>
+      <input class="input" type="password" placeholder="••••••••" value="{{ password }}" onChange="{{ onPasswordChange }}" style="height:38px; width:280px; font-size:15px; padding:0 2px; background:transparent; border:none; border-bottom:1px solid var(--color-neutral-300); color:var(--color-text);">
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:-2px; width:280px;">
+      <label style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--color-neutral-600); cursor:pointer;">
+        <input type="checkbox" style="accent-color:#8a8a8a;">
+        Recordarme
+      </label>
+      <span onClick="{{ goForgot }}" style="font-size:12.5px; color:var(--color-neutral-600); cursor:pointer;" style-hover="color:var(--color-text); text-decoration:underline;">¿Olvidaste tu contraseña?</span>
+    </div>
+
+    <sc-if value="{{ showError }}">
+      <div style="font-size:12.5px; color:var(--color-neutral-600); border:1px solid var(--color-neutral-300); padding:10px 12px;">Correo o contraseña incorrectos.</div>
+    </sc-if>
+
+    <div onClick="{{ onSubmit }}" style="cursor:pointer; margin-top:8px; background:#6e6e6e; color:#fff; font-family:var(--font-heading); font-weight:700; font-size:15px; padding:11px 14px; display:block; width:280px; text-align:center;">{{ submitLabel }}</div>
+  </div>
+
+  <div style="margin-top:24px; padding-top:18px; border-top:1px solid var(--color-divider); font-size:12.5px; color:var(--color-neutral-600); width:280px; text-align:center;">
+    ¿Necesitas una cuenta? <span style="color:var(--color-text); cursor:pointer; font-weight:600;">Contacta a tu administrador</span>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isForgot }}">
+    <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:6px; text-align:center; width:280px;">Recuperar contraseña</div>
+    <div style="font-size:12.5px; color:var(--color-neutral-600); margin-bottom:24px; width:280px;">Ingresa tu correo y te enviaremos un enlace para restablecerla.</div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+      <div class="field">
+        <label style="color:var(--color-text); font-size:12.5px;">Correo electrónico</label>
+        <input class="input" type="email" placeholder="tu@empresa.com" value="{{ resetEmail }}" onChange="{{ onResetEmailChange }}" style="height:38px; width:280px; font-size:15px; padding:0 2px; background:transparent; border:none; border-bottom:1px solid var(--color-neutral-300); color:var(--color-text);">
+      </div>
+      <div onClick="{{ sendReset }}" style="cursor:pointer; margin-top:8px; background:#6e6e6e; color:#fff; font-family:var(--font-heading); font-weight:700; font-size:15px; padding:11px 14px; display:block; width:280px; text-align:center;">Enviar enlace</div>
+      <div onClick="{{ goLogin }}" style="cursor:pointer; font-size:12.5px; color:var(--color-neutral-600); width:280px; text-align:center;" style-hover="color:var(--color-text); text-decoration:underline;">Volver a iniciar sesión</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isSent }}">
+    <div style="font-family:var(--font-heading); font-weight:800; font-size:22px; margin-bottom:6px; text-align:center; width:280px;">Revisa tu correo</div>
+    <div style="font-size:12.5px; color:var(--color-neutral-600); margin-bottom:24px; width:280px; text-align:center;">Enviamos un enlace de recuperación a <strong style="color:var(--color-text);">{{ resetEmail }}</strong>. Sigue las instrucciones para crear una nueva contraseña.</div>
+    <div onClick="{{ goLogin }}" style="cursor:pointer; background:#6e6e6e; color:#fff; font-family:var(--font-heading); font-weight:700; font-size:15px; padding:11px 14px; display:block; width:280px; text-align:center;">Volver a iniciar sesión</div>
+  </sc-if>
+
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  API = 'http://72.60.119.43/api';
+  state = { email: 'admin@aquariohabitat.local', password: '', showError: false, view: 'login', resetEmail: '', loading: false };
+
+  submit = async () => {
+    if (this.state.loading) return;
+    this.setState({ loading: true, showError: false });
+    try {
+      const res = await fetch(this.API + '/auth/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: this.state.email, password: this.state.password })
+      });
+      if (!res.ok) throw new Error('bad credentials');
+      const data = await res.json();
+      localStorage.setItem('ah-token', data.token);
+      localStorage.setItem('ah-user', JSON.stringify(data.user));
+      window.location.href = 'Dashboard-Aquario-Habitat.dc.html';
+    } catch (e) {
+      this.setState({ showError: true, loading: false });
+    }
+  };
+
+  renderVals() {
+    return {
+      email: this.state.email,
+      password: this.state.password,
+      showError: this.state.showError,
+      onEmailChange: (e) => this.setState({ email: e.target.value }),
+      onPasswordChange: (e) => this.setState({ password: e.target.value }),
+      onSubmit: this.submit,
+      submitLabel: this.state.loading ? 'Entrando…' : 'Login',
+      isLogin: this.state.view === 'login',
+      isForgot: this.state.view === 'forgot',
+      isSent: this.state.view === 'sent',
+      resetEmail: this.state.resetEmail,
+      onResetEmailChange: (e) => this.setState({ resetEmail: e.target.value }),
+      goForgot: () => this.setState({ view: 'forgot' }),
+      goLogin: () => this.setState({ view: 'login' }),
+      sendReset: () => this.setState({ view: 'sent' })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/styles.css">
+  <script src="_ds/modernist-086a6b31-4a8a-4773-b520-d48eeeeaf7ee/_ds_bundle.js"></script>
+  <script src="./image-slot.js"></script>
+  <script src="./properties-store.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root {
+      --color-accent: var(--color-text); --color-accent-100: var(--color-neutral-100); --color-accent-200: var(--color-neutral-200); --color-accent-300: var(--color-neutral-300);
+      --color-accent-600: #000; --color-accent-700: var(--color-text); --color-accent-800: var(--color-neutral-800);
+      --color-accent-2-100: var(--color-neutral-100); --color-accent-2-800: var(--color-neutral-800);
+    }
+    :root[data-theme="dark"] {
+      --color-bg: #121212; --color-surface: #1c1c1c; --color-text: #f2f0ef; --color-divider: rgba(255,255,255,0.18);
+      --color-neutral-100: #242424; --color-neutral-200: #2e2e2e; --color-neutral-300: #3a3a3a;
+      --color-neutral-600: #a3a3a3; --color-neutral-700: #c4c4c4; --color-neutral-800: #e0e0e0; --color-neutral-900: #f5f5f5;
+      --color-accent-600: #fff;
+    }
+    html, body { margin: 0; height: 100%; background: var(--color-bg); }
+    * { box-sizing: border-box; }
+    .seg-tag { cursor: pointer; user-select: none; }
+    .leaflet-container { background: var(--color-neutral-100); font-family: var(--font-body); }
+    .leaflet-control-attribution { font-size:10px; }
+    .pin { position:absolute; transform: translate(-50%,-100%); display:flex; flex-direction:column; align-items:center; }
+    .pin-badge { font-family: var(--font-heading); font-weight:800; font-size:11px; padding:4px 8px; white-space:nowrap; border:2px solid var(--color-text); background:var(--color-bg); }
+    .pin-badge.hi { background:var(--color-text); color:var(--color-bg); }
+    .pin-stem { width:2px; height:10px; background:var(--color-text); }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: var(--color-neutral-300); }
+  </style>
+</helmet>
+
+<div style="font-family: var(--font-body); color: var(--color-text); height:100vh; display:flex; flex-direction:column;" lang="es">
+
+  <!-- TOP NAV -->
+  <div style="flex:none; height:64px; border-bottom:2px solid var(--color-divider); display:flex; align-items:center; justify-content:space-between; padding:0 24px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <img src="./assets/logo-aquario-habitat.png" alt="Aquario Habitat" style="height:26px; width:26px; object-fit:contain;">
+      <div style="font-family:var(--font-heading); font-weight:800; font-size:13px; letter-spacing:0.03em;">AQUARIO HABITAT</div>
+    </div>
+    <div style="flex:1; max-width:420px; margin:0 32px;">
+      <input class="input" type="text" placeholder="Buscar colonia, ciudad o dirección…" style="width:100%; height:38px; font-size:13.5px;">
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a href="Propiedades-Publico.dc.html" target="_blank" style="font-size:11.5px; padding:6px 12px; text-decoration:none; color:var(--color-text); border:1px solid var(--color-divider); font-family:var(--font-heading); font-weight:700; display:flex; align-items:center; gap:6px;" style-hover="border-color:var(--color-text);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path></svg>
+        Ver sitio público
+      </a>
+      <div class="tag tag-neutral" style="font-size:11px;">San Luis Potosí</div>
+      <div style="display:flex; border:1px solid var(--color-divider);">
+        <div onClick="{{ setRoleAdmin }}" style="padding:5px 10px; font-size:11px; cursor:pointer; font-weight:{{ adminWeight }};" style-hover="background:var(--color-neutral-100);">Admin</div>
+        <div onClick="{{ setRoleAsesor }}" style="padding:5px 10px; font-size:11px; cursor:pointer; border-left:1px solid var(--color-divider); font-weight:{{ asesorWeight }};" style-hover="background:var(--color-neutral-100);">Asesor</div>
+      </div>
+      <a href="Perfil-Aquario-Habitat.dc.html" style="width:32px; height:32px; border-radius:50%; background:var(--color-neutral-200); display:flex; align-items:center; justify-content:center; font-family:var(--font-heading); font-weight:800; font-size:12px; color:var(--color-text); text-decoration:none;">DS</a>
+      <div onClick="{{ toggleTheme }}" title="{{ themeLabel }}" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid var(--color-divider); color:var(--color-text); transition:border-color 0.15s ease;" style-hover="border-color:var(--color-text);">
+        <sc-if value="{{ dark }}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+        </sc-if>
+        <sc-if value="{{ notDark }}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </sc-if>
+      </div>
+      <a href="Login-Aquario-Habitat.dc.html" onClick="{{ logout }}" style="font-size:11.5px; padding:6px 12px; text-decoration:none; color:var(--color-text); border:1px solid var(--color-divider); font-family:var(--font-heading); font-weight:700;" style-hover="border-color:var(--color-text);">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div style="flex:1; min-height:0; display:flex;">
+
+    <!-- SIDEBAR -->
+    <div style="width:200px; flex:none; border-right:2px solid var(--color-divider); padding:20px 0;">
+      <div class="nav-item" style="padding:10px 20px; font-size:13.5px; font-weight:700; border-left:3px solid var(--color-accent);">Propiedades</div>
+      <a href="Panel-Datos-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Fuentes</a>
+      <a href="Alertas-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Alertas</a>
+      <a href="Perfil-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Perfil</a>
+    <a href="Usuarios-Aquario-Habitat.dc.html" class="nav-item" style="display:block; padding:10px 20px; font-size:13.5px; color:var(--color-neutral-600); border-left:3px solid transparent; text-decoration:none;" style-hover="font-weight:700; color:var(--color-text);">Usuarios</a>
+    </div>
+
+    <!-- CONTENT -->
+    <div style="flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden;">
+
+  <!-- FILTER BAR -->
+  <div style="flex:none; height:56px; border-bottom:2px solid var(--color-divider); display:flex; align-items:center; gap:10px; padding:0 24px; overflow-x:auto;">
+    <sc-for list="{{ segments }}" as="seg" hint-placeholder-count="7">
+      <div class="tag seg-tag {{ seg.tagClass }}" onClick="{{ seg.onClick }}">{{ seg.name }}</div>
+    </sc-for>
+    <div style="width:2px; height:24px; background:var(--color-divider); margin:0 4px;"></div>
+    <div class="tag tag-outline">Precio ▾</div>
+    <div class="tag tag-outline">m² ▾</div>
+    <div class="tag tag-outline">Opportunity Score ▾</div>
+    <div style="flex:1;"></div>
+    <button class="btn btn-primary" style="font-size:12px; padding:8px 14px; flex:none;" onClick="{{ openAddProperty }}">+ Agregar propiedad</button>
+  </div>
+
+  <!-- ADD PROPERTY MODAL -->
+  <sc-if value="{{ addPropertyOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:2100; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45);" onClick="{{ closeAddProperty }}">
+      <div style="width:420px; background:var(--color-bg); border:2px solid var(--color-text); padding:24px;" onClick="{{ stopModalClose }}">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:17px; margin-bottom:16px;">{{ addPropertyTitle }}</div>
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:18px;">
+          <input class="input" type="text" placeholder="Título (ej. Casa en...)" value="{{ npTitle }}" onChange="{{ onNpTitle }}" style="font-size:13px;">
+          <select class="input" value="{{ npSegment }}" onChange="{{ onNpSegment }}" style="font-size:13px;">
+            <sc-for list="{{ segmentChoices }}" as="s" hint-placeholder-count="6">
+              <option value="{{ s }}">{{ s }}</option>
+            </sc-for>
+          </select>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <input class="input" type="text" placeholder="Precio (ej. $2.4M)" value="{{ npPrice }}" onChange="{{ onNpPrice }}" style="font-size:13px;">
+            <input class="input" type="text" placeholder="Superficie (ej. 200 m²)" value="{{ npSize }}" onChange="{{ onNpSize }}" style="font-size:13px;">
+          </div>
+          <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px;">
+            <input class="input" type="text" placeholder="Calle" value="{{ npCalle }}" onChange="{{ onNpCalle }}" style="font-size:13px;">
+            <input class="input" type="text" placeholder="Número" value="{{ npNumero }}" onChange="{{ onNpNumero }}" style="font-size:13px;">
+          </div>
+          <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px;">
+            <input class="input" type="text" placeholder="Colonia" value="{{ npColonia }}" onChange="{{ onNpColonia }}" style="font-size:13px;">
+            <input class="input" type="text" placeholder="CP" value="{{ npCP }}" onChange="{{ onNpCP }}" style="font-size:13px;">
+          </div>
+
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--color-neutral-600); margin-top:4px;">Ubicación en el mapa (clic o arrastra el pin)</div>
+          <div ref="{{ npModalMapRef }}" style="width:100%; height:180px; border:1px solid var(--color-divider);"></div>
+          <div style="font-size:11px; color:var(--color-neutral-600);">Lat {{ npLat }}, Lng {{ npLng }}</div>
+
+          <sc-if value="{{ npShowResidencial }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <input class="input" type="number" placeholder="Recámaras" value="{{ npRecamaras }}" onChange="{{ onNpRecamaras }}" style="font-size:13px;">
+              <input class="input" type="number" placeholder="Baños" value="{{ npBanos }}" onChange="{{ onNpBanos }}" style="font-size:13px;">
+            </div>
+            <input class="input" type="number" placeholder="Estacionamientos" value="{{ npEstacionamientos }}" onChange="{{ onNpEstacionamientos }}" style="font-size:13px;">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--color-neutral-600); margin-top:4px;">Amenidades</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <sc-for list="{{ npAmenityOptions }}" as="a" hint-placeholder-count="6">
+                <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;"><input type="checkbox" checked="{{ a.checked }}" onChange="{{ a.onToggle }}" style="accent-color:var(--color-text);">{{ a.name }}</label>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ npShowBanosEstacOnly }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <input class="input" type="number" placeholder="Baños" value="{{ npBanos }}" onChange="{{ onNpBanos }}" style="font-size:13px;">
+              <input class="input" type="number" placeholder="Estacionamientos" value="{{ npEstacionamientos }}" onChange="{{ onNpEstacionamientos }}" style="font-size:13px;">
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ npHasSegmentField }}" hint-placeholder-val="{{ false }}">
+            <div class="field"><label style="font-size:11px;">{{ npSegmentFieldLabel }}</label>
+              <select class="input" value="{{ npSegmentField }}" onChange="{{ onNpSegmentField }}" style="font-size:13px;">
+                <option value="">Selecciona</option>
+                <sc-for list="{{ npSegmentFieldOptions }}" as="o" hint-placeholder-count="4">
+                  <option value="{{ o }}">{{ o }}</option>
+                </sc-for>
+              </select>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" style="flex:1;" onClick="{{ closeAddProperty }}">Cancelar</button>
+          <button class="btn btn-primary" style="flex:1;" onClick="{{ submitAddProperty }}">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- MAIN -->
+  <div style="flex:1; min-height:0; display:flex; overflow-x:auto;">
+
+    <!-- MAP -->
+    <div style="flex:1 1 0; min-width:480px; position:relative; border-right:2px solid var(--color-divider); overflow:hidden;">
+      <div ref="{{ mapRef }}" style="position:absolute; inset:0; width:100%; height:100%;"></div>
+
+      <div style="position:absolute; bottom:20px; left:20px; z-index:400; background:var(--color-bg); border:2px solid var(--color-text); padding:10px 14px; font-size:12px; display:flex; gap:14px; align-items:center;">
+        <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px; height:10px; background:var(--color-text);"></div>Oportunidad alta</div>
+        <div style="display:flex; align-items:center; gap:6px;"><div style="width:10px; height:10px; border:2px solid var(--color-text);"></div>Estándar</div>
+      </div>
+    </div>
+
+    <!-- LISTING -->
+    <div style="width:400px; flex:none; display:flex; flex-direction:column; border-right:2px solid var(--color-divider);">
+      <div style="flex:none; padding:16px 20px; border-bottom:2px solid var(--color-divider);">
+        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:15px;">{{ count }} propiedades</div>
+          <div style="font-size:12px; color:var(--color-neutral-600);">Ordenar: Score ▾</div>
+        </div>
+        <div style="font-size:11px; color:var(--color-neutral-600); margin-top:2px;">Según el área visible del mapa</div>
+      </div>
+      <div style="flex:1; overflow-y:auto;">
+        <sc-for list="{{ properties }}" as="p" hint-placeholder-count="5">
+          <div style="display:flex; gap:12px; padding:16px 20px; border-bottom:1px solid var(--color-divider); cursor:pointer;" onClick="{{ p.onOpenDetail }}" style-hover="background:var(--color-neutral-100);">
+            <div style="width:72px; height:72px; flex:none; background:var(--color-neutral-200);"></div>
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; line-height:1.35;">{{ p.title }}</div>
+                <div class="tag {{ p.scoreTagClass }}" style="font-size:10px; flex:none;">{{ p.score }}</div>
+              </div>
+              <div style="font-size:12px; color:var(--color-neutral-600); margin:4px 0 6px;">{{ p.segment }} · {{ p.size }}</div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                <div style="font-family:var(--font-heading); font-weight:800; font-size:15px;">{{ p.price }}</div>
+                <div style="font-size:11.5px; color:var(--color-neutral-600);">{{ p.pricePerSqm }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ isEmpty }}">
+          <div style="padding:56px 20px; text-align:center;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-400)" stroke-width="1.5" style="margin:0 auto 12px;"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+            <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:4px;">Sin propiedades en este segmento</div>
+            <div style="font-size:12.5px; color:var(--color-neutral-600);">Prueba otro segmento o espera la próxima corrida del crawler.</div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- RIGHT RAIL: ANALYST + ALERTS -->
+    <div style="width:340px; flex:none; display:flex; flex-direction:column;">
+
+      <div style="flex:1.2; min-height:0; display:flex; flex-direction:column; border-bottom:2px solid var(--color-divider);">
+        <div style="flex:none; padding:16px 20px 12px; border-bottom:1px solid var(--color-divider);">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:14px;">Analista IA</div>
+        </div>
+        <div style="flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:12px;">
+          <sc-for list="{{ aiMessages }}" as="m" hint-placeholder-count="2">
+            <div style="align-self:{{ m.align }}; max-width:{{ m.maxWidth }}; background:{{ m.bg }}; color:{{ m.color }}; border:{{ m.border }}; padding:10px 12px; font-size:13px; line-height:1.55;">{{ m.text }}</div>
+          </sc-for>
+          <sc-if value="{{ aiLoading }}" hint-placeholder-val="{{ false }}">
+            <div style="align-self:flex-start; font-size:12px; color:var(--color-neutral-600);">Analizando…</div>
+          </sc-if>
+        </div>
+        <div style="flex:none; padding:12px 20px; border-top:1px solid var(--color-divider); display:flex; gap:8px;">
+          <input class="input" type="text" placeholder="Preguntar al analista…" style="flex:1; height:38px; font-size:13px;" value="{{ aiInput }}" onChange="{{ onAiInputChange }}" onKeyDown="{{ onAiKeyDown }}">
+          <button class="btn btn-primary btn-icon" onClick="{{ sendAiQuestion }}" disabled="{{ aiLoading }}" aria-label="Enviar">→</button>
+        </div>
+      </div>
+
+      <div style="flex:1; min-height:0; display:flex; flex-direction:column;">
+        <div style="flex:none; padding:16px 20px 12px; display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid var(--color-divider);">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:14px;">Alertas activas</div>
+          <div class="tag tag-accent" style="font-size:10px;">3</div>
+        </div>
+        <div style="flex:1; overflow-y:auto; padding:14px 20px; display:flex; flex-direction:column; gap:14px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; margin-bottom:2px;">Terreno industrial &gt;5,000 m²</div>
+            <div style="font-size:12px; color:var(--color-neutral-600);">Nuevo León · bajo precio promedio</div>
+          </div>
+          <div>
+            <div style="font-size:13px; font-weight:700; margin-bottom:2px;">Casa 3 rec. en Lomas</div>
+            <div style="font-size:12px; color:var(--color-neutral-600);">Bajo $2.5M · nueva publicación</div>
+          </div>
+          <div>
+            <div style="font-size:13px; font-weight:700; margin-bottom:2px;">Local comercial Centro</div>
+            <div style="font-size:12px; color:var(--color-neutral-600);">Opportunity Score &gt; 80</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+    </div>
+  </div>
+
+</div>
+
+<sc-if value="{{ detail }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; inset:0; z-index:3000; display:flex; align-items:center; justify-content:center;">
+    <div style="position:absolute; inset:0; background:rgba(0,0,0,0.5);" onClick="{{ closeDetail }}"></div>
+    <div style="position:relative; width:560px; max-height:86vh; overflow-y:auto; background:var(--color-bg); border:2px solid var(--color-text);">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:2px solid var(--color-divider); position:sticky; top:0; background:var(--color-bg);">
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:16px;">Ficha de propiedad</div>
+        <div onClick="{{ closeDetail }}" style="cursor:pointer; font-size:16px;">✕</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:var(--color-divider);">
+        <div style="background:var(--color-neutral-200); height:140px;"></div>
+        <div style="background:var(--color-neutral-200); height:140px;"></div>
+        <div style="background:var(--color-neutral-200); height:140px;"></div>
+      </div>
+      <div style="padding:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:4px;">
+          <div style="font-family:var(--font-heading); font-weight:800; font-size:20px; max-width:70%;">{{ detail.title }}</div>
+          <div class="tag {{ detail.scoreTagClass }}" style="font-size:11px;">Score {{ detail.score }}</div>
+        </div>
+        <div style="font-size:13px; color:var(--color-neutral-600); margin-bottom:20px;">{{ detail.address }}</div>
+
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--color-divider); border:1px solid var(--color-divider); margin-bottom:24px;">
+          <div style="background:var(--color-bg); padding:12px;">
+            <div style="font-size:11px; color:var(--color-neutral-600);">Precio</div>
+            <div style="font-family:var(--font-heading); font-weight:800; font-size:16px;">{{ detail.price }}</div>
+          </div>
+          <div style="background:var(--color-bg); padding:12px;">
+            <div style="font-size:11px; color:var(--color-neutral-600);">Superficie</div>
+            <div style="font-family:var(--font-heading); font-weight:800; font-size:16px;">{{ detail.size }}</div>
+          </div>
+          <div style="background:var(--color-bg); padding:12px;">
+            <div style="font-size:11px; color:var(--color-neutral-600);">Precio/m²</div>
+            <div style="font-family:var(--font-heading); font-weight:800; font-size:16px;">{{ detail.pricePerSqm }}</div>
+          </div>
+        </div>
+
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:10px;">Composición del Opportunity Score</div>
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px;"><span style="color:var(--color-neutral-600);">Precio</span><span style="font-weight:700;">{{ detail.subPrecio }}</span></div>
+            <div style="height:6px; background:var(--color-neutral-200);"><div style="height:100%; background:var(--color-text); width:{{ detail.subPrecio }}%;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px;"><span style="color:var(--color-neutral-600);">Ubicación</span><span style="font-weight:700;">{{ detail.subUbicacion }}</span></div>
+            <div style="height:6px; background:var(--color-neutral-200);"><div style="height:100%; background:var(--color-text); width:{{ detail.subUbicacion }}%;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px;"><span style="color:var(--color-neutral-600);">Plusvalía</span><span style="font-weight:700;">{{ detail.subPlusvalia }}</span></div>
+            <div style="height:6px; background:var(--color-neutral-200);"><div style="height:100%; background:var(--color-text); width:{{ detail.subPlusvalia }}%;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px;"><span style="color:var(--color-neutral-600);">Liquidez</span><span style="font-weight:700;">{{ detail.subLiquidez }}</span></div>
+            <div style="height:6px; background:var(--color-neutral-200);"><div style="height:100%; background:var(--color-text); width:{{ detail.subLiquidez }}%;"></div></div>
+          </div>
+        </div>
+
+        <div style="font-family:var(--font-heading); font-weight:800; font-size:14px; margin-bottom:10px;">Datos de soporte</div>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:24px; font-size:13px;">
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--color-neutral-600);">Precio vs. promedio de zona ({{ detail.avgZonePrice }})</span><span style="font-weight:700;">{{ detail.vsAvg }}</span></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--color-neutral-600);">Comparables activos</span><span style="font-weight:700;">{{ detail.comparables }}</span></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--color-neutral-600);">Tendencia de la zona</span><span style="font-weight:700;">{{ detail.trend }}</span></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:2px solid var(--color-divider); margin-bottom:20px;">
+          <div style="font-size:12px; color:var(--color-neutral-600);">Fuente: {{ detail.source }}</div>
+          <div class="tag tag-outline" style="font-size:10px;">{{ detail.confidence }}</div>
+        </div>
+
+        <sc-if value="{{ contactOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid var(--color-divider); padding:16px; margin-bottom:20px;">
+            <div style="font-family:var(--font-heading); font-weight:800; font-size:13px; margin-bottom:2px;">Contactar propietario</div>
+            <div style="font-size:12px; color:var(--color-neutral-600); margin-bottom:12px;">{{ detail.ownerName }} · {{ detail.ownerPhone }}</div>
+            <div style="display:flex; gap:8px; margin-bottom:14px;">
+              <a href="tel:{{ detail.ownerPhone }}" style="flex:1; text-align:center; text-decoration:none; color:var(--color-text); border:1px solid var(--color-divider); padding:8px; font-size:12px; font-weight:700;" style-hover="border-color:var(--color-text);">Llamar</a>
+              <a href="{{ waLink }}" style="flex:1; text-align:center; text-decoration:none; color:var(--color-text); border:1px solid var(--color-divider); padding:8px; font-size:12px; font-weight:700;" style-hover="border-color:var(--color-text);">WhatsApp</a>
+              <a href="mailto:{{ detail.ownerEmail }}" style="flex:1; text-align:center; text-decoration:none; color:var(--color-text); border:1px solid var(--color-divider); padding:8px; font-size:12px; font-weight:700;" style-hover="border-color:var(--color-text);">Correo</a>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <input class="input" type="text" placeholder="Tu nombre" style="font-size:13px;">
+              <input class="input" type="text" placeholder="Tu teléfono" style="font-size:13px;">
+              <textarea class="input" style="font-size:13px;">{{ contactMessage }}</textarea>
+              <button class="btn btn-primary" style="width:100%;" onClick="{{ closeContact }}">Enviar solicitud</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display:flex; gap:12px;">
+          <button class="btn btn-secondary" style="flex:1;" onClick="{{ closeDetail }}">Cerrar</button>
+          <button class="btn btn-secondary" style="flex:1;" onClick="{{ openEditFromDetail }}">Editar</button>
+          <sc-if value="{{ notContactOpen }}">
+            <button class="btn btn-primary" style="flex:1;" onClick="{{ openContact }}">Contactar propietario</button>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  API = 'http://72.60.119.43/api';
+  authHeaders() {
+    const token = localStorage.getItem('ah-token');
+    return token ? { Authorization: 'Bearer ' + token } : {};
+  }
+  state = { activeSegment: 'Todos', dark: false, selectedId: null, detailId: null, role: 'admin', contactOpen: false, mapBounds: null,
+    aiMessages: [
+      { role: 'user', text: '¿Está bien valuado el terreno de Zona Industrial?' },
+      { role: 'assistant', text: 'Sí — su precio de $1,077/m² está 18% por debajo del promedio de la zona ($1,310/m²), con 6 comparables activos. Opportunity Score: 88.' }
+    ], aiInput: '', aiLoading: false };
+
+  setRole(role) { localStorage.setItem('ah-role', role); this.setState({ role }); }
+  NP_DEFAULTS = { addPropertyOpen: false, editingId: null, npTitle: '', npSegment: 'Residencial', npPrice: '', npSize: '', npCalle: '', npNumero: '', npColonia: '', npCP: '', npRecamaras: '', npBanos: '', npEstacionamientos: '', npAmenidades: [], npSegmentField: '', npLat: 22.1565, npLng: -100.9855 };
+  npModalMapRef = React.createRef();
+  npModalMap = null;
+  npModalMarker = null;
+
+  ensureNpModalMap() {
+    if (!this.addPropState.addPropertyOpen) return;
+    if (!window.L || !this.npModalMapRef.current) { setTimeout(() => this.ensureNpModalMap(), 60); return; }
+    if (this.npModalMap) { this.npModalMap.invalidateSize(); return; }
+    const { npLat, npLng } = this.addPropState;
+    this.npModalMap = L.map(this.npModalMapRef.current, { zoomControl: false }).setView([npLat, npLng], 13);
+    L.control.zoom({ position: 'bottomright' }).addTo(this.npModalMap);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(this.npModalMap);
+    this.npModalMarker = L.marker([npLat, npLng], { draggable: true }).addTo(this.npModalMap);
+    this.npModalMarker.on('dragend', () => {
+      const ll = this.npModalMarker.getLatLng();
+      this.addPropState.npLat = ll.lat; this.addPropState.npLng = ll.lng;
+      this.forceUpdate();
+    });
+    this.npModalMap.on('click', (e) => {
+      this.npModalMarker.setLatLng(e.latlng);
+      this.addPropState.npLat = e.latlng.lat; this.addPropState.npLng = e.latlng.lng;
+      this.forceUpdate();
+    });
+  }
+  teardownNpModalMap() {
+    if (this.npModalMap) { this.npModalMap.remove(); this.npModalMap = null; this.npModalMarker = null; }
+  }
+  addPropState = { ...this.NP_DEFAULTS };
+  SEGMENT_FIELD_MAP = {
+    Comercial: { label: 'Cap Rate', options: ['5% o más', '7% o más', '9% o más', 'Sin dato'] },
+    Industrial: { label: 'Altura libre', options: ['6m+', '8m+', '10m+', '12m+'] },
+    Terrenos: { label: 'Uso de suelo', options: ['Habitacional', 'Comercial', 'Industrial', 'Mixto'] },
+    Ranchos: { label: 'Vocación', options: ['Agrícola', 'Ganadera', 'Recreativa', 'Con cuerpos de agua'] },
+    Desarrollos: { label: 'Avance de obra', options: ['Preventa', 'En construcción', 'Entrega inmediata'] }
+  };
+  NP_AMENITIES = ['Cochera', 'Jardín', 'Alberca', 'Seguridad 24h', 'Aire acondicionado', 'Cuarto de servicio'];
+  openAddProperty() {
+    Object.assign(this.addPropState, { addPropertyOpen: true, npLat: 22.1565, npLng: -100.9855 });
+    this.forceUpdate();
+    setTimeout(() => this.ensureNpModalMap(), 60);
+  }
+  closeAddProperty() { Object.assign(this.addPropState, { addPropertyOpen: false }); this.teardownNpModalMap(); this.forceUpdate(); }
+  setNp(field, val) { this.addPropState[field] = val; this.forceUpdate(); }
+  toggleNpAmenity(name) {
+    const a = this.addPropState.npAmenidades;
+    this.addPropState.npAmenidades = a.includes(name) ? a.filter(x => x !== name) : [...a, name];
+    this.forceUpdate();
+  }
+  openEditProperty(p) {
+    this.addPropState = {
+      addPropertyOpen: true, editingId: p.id || null,
+      npTitle: p.title, npSegment: p.segment, npPrice: p.price, npSize: p.size,
+      npCalle: p.calle || '', npNumero: p.numero || '', npColonia: p.colonia || p.address || '', npCP: p.cp || '',
+      npRecamaras: p.recamaras || '', npBanos: p.banos || '', npEstacionamientos: p.estacionamientos || '',
+      npAmenidades: p.amenidades || [], npSegmentField: p.segmentField || '',
+      npLat: typeof p.lat === 'number' ? p.lat : 22.1565, npLng: typeof p.lng === 'number' ? p.lng : -100.9855
+    };
+    this.setState({ detailId: null });
+    this.forceUpdate();
+    setTimeout(() => this.ensureNpModalMap(), 60);
+  }
+  submitAddProperty() {
+    const s = this.addPropState;
+    if (!s.npTitle.trim()) return;
+    const addressParts = [s.npCalle && s.npNumero ? `${s.npCalle} ${s.npNumero}` : s.npCalle, s.npColonia, s.npCP ? `CP ${s.npCP}` : ''].filter(Boolean);
+    const payload = {
+      title: s.npTitle, segment: s.npSegment, propertyType: s.npSegment, price: s.npPrice || '—', size: s.npSize || '—',
+      colonia: s.npColonia, municipality: 'San Luis Potosí',
+      recamaras: parseInt(s.npRecamaras) || 0, banos: parseInt(s.npBanos) || 0, estacionamientos: parseInt(s.npEstacionamientos) || 0,
+      amenidades: s.npAmenidades, segmentField: s.npSegmentField || '', lat: s.npLat, lng: s.npLng
+    };
+    const url = s.editingId ? `${this.API}/properties/${s.editingId}` : `${this.API}/properties`;
+    const method = s.editingId ? 'PUT' : 'POST';
+    fetch(url, { method, headers: { 'Content-Type': 'application/json', ...this.authHeaders() }, body: JSON.stringify(payload) })
+      .then(() => {
+        this.addPropState = { ...this.NP_DEFAULTS };
+        this.teardownNpModalMap();
+        this.loadShared();
+        this.forceUpdate();
+      })
+      .catch(() => { this.addPropState = { ...this.NP_DEFAULTS }; this.teardownNpModalMap(); this.forceUpdate(); });
+  }
+
+  selectProperty(p) { this.setState({ selectedId: p.title }); }
+  closeSelected() { this.setState({ selectedId: null }); }
+  openDetail(p) { this.setState({ detailId: p.title, contactOpen: false }); }
+  closeDetail() { this.setState({ detailId: null }); }
+  openContact() { this.setState({ contactOpen: true }); }
+  closeContact() { this.setState({ contactOpen: false }); }
+
+  mapRef = React.createRef();
+  map = null;
+  markersLayer = null;
+
+  ensureMap() {
+    if (this.map || !window.L || !this.mapRef.current) {
+      if (!this.map) setTimeout(() => this.ensureMap(), 50);
+      return;
+    }
+    this.map = L.map(this.mapRef.current, { zoomControl: false }).setView([22.1565, -100.9855], 12);
+    L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(this.map);
+    this.markersLayer = L.layerGroup().addTo(this.map);
+    this.syncMarkers();
+    this.map.on('moveend', () => this.onMapBoundsChange());
+    this.map.on('zoomend', () => this.syncMarkers());
+    this.onMapBoundsChange();
+  }
+
+  onMapBoundsChange() {
+    if (!this.map) return;
+    const b = this.map.getBounds();
+    this.setState({ mapBounds: { south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() } });
+  }
+
+  syncMarkers() {
+    if (!this.markersLayer || !this.map) return;
+    this.markersLayer.clearLayers();
+    const active = this.state.activeSegment;
+    const visible = active === 'Todos' ? this.allProperties : this.allProperties.filter(p => p.segment === active);
+    this.buildClusters(visible).forEach(group => {
+      if (group.length === 1) {
+        const p = group[0];
+        const hi = p.score >= 80 || p.title === this.state.selectedId;
+        const compactPrice = window.AHProperties && window.AHProperties.formatMoneyCompactShort ? window.AHProperties.formatMoneyCompactShort(p.price) : p.price;
+        const html = `<div style="display:flex;flex-direction:column;align-items:center;"><div style="font-family:var(--font-heading);font-weight:800;font-size:11px;padding:4px 8px;white-space:nowrap;border:2px solid var(--color-text);background:${hi ? 'var(--color-text)' : 'var(--color-bg)'};color:${hi ? '#fff' : 'var(--color-text)'};">${compactPrice}</div><div style="width:2px;height:10px;background:var(--color-text);"></div></div>`;
+        const icon = L.divIcon({ html, className: '', iconSize: null, iconAnchor: [30, 34] });
+        const marker = L.marker([p.lat, p.lng], { icon }).addTo(this.markersLayer);
+        marker.on('click', () => this.openDetail(p));
+      } else {
+        const lat = group.reduce((s, p) => s + p.lat, 0) / group.length;
+        const lng = group.reduce((s, p) => s + p.lng, 0) / group.length;
+        const html = `<div style="display:flex;flex-direction:column;align-items:center;"><div style="font-family:var(--font-heading);font-weight:800;font-size:11px;padding:4px 8px;white-space:nowrap;border:2px solid var(--color-text);background:var(--color-accent);color:#fff;border-radius:999px;">${group.length} propiedades</div><div style="width:2px;height:10px;background:var(--color-text);"></div></div>`;
+        const icon = L.divIcon({ html, className: '', iconSize: null, iconAnchor: [30, 34] });
+        const marker = L.marker([lat, lng], { icon }).addTo(this.markersLayer);
+        marker.on('click', () => this.map.setView([lat, lng], Math.min(this.map.getZoom() + 2, 18)));
+      }
+    });
+  }
+
+  // Iterative fixed-point clustering: merges any two groups whose centroids are
+  // still closer than a label-sized threshold, recomputing centroids each merge,
+  // until no pair collides — a single greedy pass left some cluster-vs-cluster and
+  // point-vs-point pairs closer together than their rendered label boxes (~90px wide).
+  buildClusters(visible) {
+    const THRESH = 100;
+    let groups = visible
+      .filter(p => typeof p.lat === 'number' && typeof p.lng === 'number')
+      .map(p => ({ props: [p], pt: this.map.latLngToContainerPoint([p.lat, p.lng]) }));
+    let merged = true;
+    while (merged) {
+      merged = false;
+      outer: for (let i = 0; i < groups.length; i++) {
+        for (let j = i + 1; j < groups.length; j++) {
+          const dx = groups[i].pt.x - groups[j].pt.x, dy = groups[i].pt.y - groups[j].pt.y;
+          if (Math.sqrt(dx * dx + dy * dy) < THRESH) {
+            const a = groups[i], b = groups[j];
+            const n = a.props.length + b.props.length;
+            const pt = { x: (a.pt.x * a.props.length + b.pt.x * b.props.length) / n, y: (a.pt.y * a.props.length + b.pt.y * b.props.length) / n };
+            groups.splice(j, 1); groups.splice(i, 1);
+            groups.push({ props: a.props.concat(b.props), pt });
+            merged = true;
+            break outer;
+          }
+        }
+      }
+    }
+    return groups.map(g => g.props);
+  }
+
+  componentDidMount() {
+    if (!localStorage.getItem('ah-token')) { window.location.href = 'Login-Aquario-Habitat.dc.html'; return; }
+    const saved = localStorage.getItem('ah-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    const role = localStorage.getItem('ah-role') || 'admin';
+    this.setState({ dark: saved === 'dark', role });
+    this.loadShared();
+    this.ensureMap();
+  }
+  componentWillUnmount() {}
+  componentDidUpdate(prevState) {
+    if (prevState && (prevState.activeSegment !== this.state.activeSegment || prevState.selectedId !== this.state.selectedId)) {
+      this.syncMarkers();
+    }
+  }
+
+  toggleTheme() {
+    const next = this.state.dark ? 'light' : 'dark';
+    localStorage.setItem('ah-theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+    this.setState({ dark: next === 'dark' });
+  }
+
+  enrichmentByTitle = {
+    'Casa en Lomas de San Luis': { avgZonePrice: '$11,900/m²', vsAvg: '-8%', comparables: 9, trend: 'Al alza (+4% trimestral)', source: 'Manual', confidence: 'Confianza alta', subPrecio: 88, subUbicacion: 95, subPlusvalia: 90, subLiquidez: 94, ownerName: 'Roberto Aguilar', ownerPhone: '+52 444 210 5588', ownerEmail: 'roberto.aguilar@gmail.com' },
+    'Local comercial en Centro': { avgZonePrice: '$21,500/m²', vsAvg: '+3%', comparables: 5, trend: 'Estable', source: 'Inmuebles24', confidence: 'Confianza alta', subPrecio: 52, subUbicacion: 80, subPlusvalia: 55, subLiquidez: 68, ownerName: 'Inmobiliaria Centro SLP', ownerPhone: '+52 444 812 3390', ownerEmail: 'contacto@inmocentroslp.mx' },
+    'Terreno en Zona Industrial': { avgZonePrice: '$1,310/m²', vsAvg: '-18%', comparables: 6, trend: 'Al alza (+6% trimestral)', source: 'Vivanuncios', confidence: 'Confianza media', subPrecio: 92, subUbicacion: 82, subPlusvalia: 91, subLiquidez: 78, ownerName: 'Grupo Industrial Potosino', ownerPhone: '+52 444 305 7712', ownerEmail: 'ventas@gipotosino.mx' },
+    'Depto en Valle Dorado': { avgZonePrice: '$19,800/m²', vsAvg: '-4%', comparables: 8, trend: 'Estable', source: 'Inmuebles24', confidence: 'Confianza alta', subPrecio: 66, subUbicacion: 85, subPlusvalia: 62, subLiquidez: 71, ownerName: 'Laura Ibarra', ownerPhone: '+52 444 998 2214', ownerEmail: 'laura.ibarra@hotmail.com' },
+    'Rancho en Villa de Reyes': { avgZonePrice: '$980/m²', vsAvg: '-3%', comparables: 2, trend: 'Sin cambios', source: 'Manual', confidence: 'Confianza alta', subPrecio: 58, subUbicacion: 48, subPlusvalia: 50, subLiquidez: 40, ownerName: 'Familia Reyes Torres', ownerPhone: '+52 444 116 4423', ownerEmail: 'reyestorres.rancho@gmail.com' },
+    'Terreno en Zona Industrial 2': { avgZonePrice: '$1,310/m²', vsAvg: '-26%', comparables: 6, trend: 'Al alza (+6% trimestral)', source: 'Lamudi', confidence: 'Confianza baja', subPrecio: 95, subUbicacion: 74, subPlusvalia: 88, subLiquidez: 60, ownerName: 'Desarrollos del Altiplano', ownerPhone: '+52 444 640 9981', ownerEmail: 'info@altiplanodev.mx' },
+    'Desarrollo Los Encinos': { avgZonePrice: '$3,400/m²', vsAvg: '-8%', comparables: 3, trend: 'Al alza (+5% trimestral)', source: 'Vivanuncios', confidence: 'Confianza media', subPrecio: 79, subUbicacion: 80, subPlusvalia: 85, subLiquidez: 72, ownerName: 'Los Encinos Desarrollos S.A.', ownerPhone: '+52 444 275 6630', ownerEmail: 'ventas@losencinos.mx' }
+  };
+  DEFAULT_ENRICHMENT = { avgZonePrice: '—', vsAvg: '—', comparables: 0, trend: 'Sin datos', source: 'Manual', confidence: 'Confianza baja', subPrecio: 60, subUbicacion: 60, subPlusvalia: 60, subLiquidez: 60, ownerName: '—', ownerPhone: '—', ownerEmail: '—' };
+  allProperties = [];
+
+  onAiInputChange = (e) => this.setState({ aiInput: e.target.value });
+  onAiKeyDown = (e) => { if (e.key === 'Enter' && !this.state.aiLoading) this.sendAiQuestion(); };
+  sendAiQuestion = async () => {
+    const question = this.state.aiInput.trim();
+    if (!question || this.state.aiLoading) return;
+    const history = [...this.state.aiMessages, { role: 'user', text: question }];
+    this.setState({ aiMessages: history, aiInput: '', aiLoading: true });
+    const list = (this.allProperties || []);
+    // Context grounded in the real store — same data Dashboard/Público show, not invented.
+    const context = list.slice(0, 40).map(p =>
+      `- ${p.title} (${p.segment}, ${p.propertyType || ''}): ${p.price}, ${p.size}, ${p.pricePerSqm || ''}, score ${p.score}, zona: ${p.address || ''}. ${p.scoreNote || ''}`
+    ).join('\n');
+    const system = `Eres el Analista IA de Aquario Habitat, plataforma de inteligencia inmobiliaria en San Luis Potosí. Responde en español, breve y con datos concretos (precios, $/m², score, comparables) tomados SOLO del inventario de abajo. Si no hay dato suficiente dilo explícitamente, no inventes cifras.\n\nInventario actual:\n${context || '(sin propiedades cargadas)'}`;
+    try {
+      const answer = await window.claude.complete({
+        system,
+        messages: history.map(m => ({ role: m.role, content: m.text }))
+      });
+      this.setState({ aiMessages: [...history, { role: 'assistant', text: answer }], aiLoading: false });
+    } catch (e) {
+      this.setState({ aiMessages: [...history, { role: 'assistant', text: 'No pude conectar con el analista. Intenta de nuevo.' }], aiLoading: false });
+    }
+  };
+  loadShared() {
+    fetch(this.API + '/properties', { headers: this.authHeaders() })
+      .then(r => r.json())
+      .then(list => {
+        this.allProperties = list.map(p => ({
+          ...this.DEFAULT_ENRICHMENT, ...(this.enrichmentByTitle[p.title] || {}), ...p,
+          top: p.top || (10 + Math.random() * 75) + '%', left: p.left || (10 + Math.random() * 75) + '%'
+        }));
+        this.forceUpdate();
+        this.syncMarkers();
+      })
+      .catch(() => {});
+  }
+
+  setSegment(name) {
+    this.setState({ activeSegment: name });
+  }
+
+  renderVals() {
+    const names = ['Todos', 'Residencial', 'Comercial', 'Industrial', 'Terrenos', 'Ranchos', 'Desarrollos'];
+    const active = this.state.activeSegment;
+    const segments = names.map(name => ({
+      name,
+      tagClass: name === active ? 'tag-accent' : 'tag-outline',
+      onClick: () => this.setSegment(name)
+    }));
+    const properties = (active === 'Todos' ? this.allProperties : this.allProperties.filter(p => p.segment === active))
+      .filter(p => {
+        const b = this.state.mapBounds;
+        if (!b || typeof p.lat !== 'number' || typeof p.lng !== 'number') return true;
+        return p.lat >= b.south && p.lat <= b.north && p.lng >= b.west && p.lng <= b.east;
+      })
+      .map(p => ({
+        ...p,
+        scoreTagClass: p.score >= 80 ? 'tag-accent' : 'tag-outline',
+        pinClass: p.score >= 80 ? 'hi' : '',
+        onSelect: () => this.selectProperty(p),
+        stopDrag: (e) => e.stopPropagation(),
+        onOpenDetail: () => this.openDetail(p)
+      }));
+    const selected = this.state.selectedId ? properties.find(p => p.title === this.state.selectedId) : null;
+    const detail = this.state.detailId ? properties.find(p => p.title === this.state.detailId) : null;
+    return {
+      segments, properties, count: properties.length, isEmpty: properties.length === 0,
+      aiMessages: this.state.aiMessages.map(m => ({
+        text: m.text,
+        align: m.role === 'user' ? 'flex-end' : 'flex-start',
+        maxWidth: m.role === 'user' ? '88%' : '92%',
+        bg: m.role === 'user' ? 'var(--color-neutral-800)' : 'transparent',
+        color: m.role === 'user' ? 'var(--color-neutral-100)' : 'var(--color-text)',
+        border: m.role === 'user' ? 'none' : '1px solid var(--color-divider)'
+      })),
+      aiInput: this.state.aiInput, aiLoading: this.state.aiLoading,
+      onAiInputChange: this.onAiInputChange, onAiKeyDown: this.onAiKeyDown, sendAiQuestion: this.sendAiQuestion,
+      addPropertyOpen: this.addPropState.addPropertyOpen,
+      openAddProperty: () => this.openAddProperty(),
+      closeAddProperty: () => this.closeAddProperty(),
+      stopModalClose: (e) => e.stopPropagation(),
+      npTitle: this.addPropState.npTitle, onNpTitle: (e) => this.setNp('npTitle', e.target.value),
+      npSegment: this.addPropState.npSegment, onNpSegment: (e) => this.setNp('npSegment', e.target.value),
+      npPrice: this.addPropState.npPrice, onNpPrice: (e) => this.setNp('npPrice', e.target.value),
+      npSize: this.addPropState.npSize, onNpSize: (e) => this.setNp('npSize', e.target.value),
+      npCalle: this.addPropState.npCalle, onNpCalle: (e) => this.setNp('npCalle', e.target.value),
+      npNumero: this.addPropState.npNumero, onNpNumero: (e) => this.setNp('npNumero', e.target.value),
+      npColonia: this.addPropState.npColonia, onNpColonia: (e) => this.setNp('npColonia', e.target.value),
+      npCP: this.addPropState.npCP, onNpCP: (e) => this.setNp('npCP', e.target.value),
+      segmentChoices: ['Residencial', 'Comercial', 'Industrial', 'Terrenos', 'Ranchos', 'Desarrollos'],
+      submitAddProperty: () => this.submitAddProperty(),
+      addPropertyTitle: this.addPropState.editingId ? 'Editar propiedad' : 'Agregar propiedad',
+      openEditFromDetail: () => this.openEditProperty(detail),
+      npShowResidencial: this.addPropState.npSegment === 'Residencial',
+      npShowBanosEstacOnly: ['Comercial', 'Industrial'].includes(this.addPropState.npSegment),
+      npRecamaras: this.addPropState.npRecamaras, onNpRecamaras: (e) => this.setNp('npRecamaras', e.target.value),
+      npBanos: this.addPropState.npBanos, onNpBanos: (e) => this.setNp('npBanos', e.target.value),
+      npEstacionamientos: this.addPropState.npEstacionamientos, onNpEstacionamientos: (e) => this.setNp('npEstacionamientos', e.target.value),
+      npAmenityOptions: this.NP_AMENITIES.map(name => ({ name, checked: this.addPropState.npAmenidades.includes(name), onToggle: () => this.toggleNpAmenity(name) })),
+      npHasSegmentField: !!this.SEGMENT_FIELD_MAP[this.addPropState.npSegment],
+      npSegmentFieldLabel: (this.SEGMENT_FIELD_MAP[this.addPropState.npSegment] || {}).label || '',
+      npSegmentFieldOptions: (this.SEGMENT_FIELD_MAP[this.addPropState.npSegment] || {}).options || [],
+      npSegmentField: this.addPropState.npSegmentField, onNpSegmentField: (e) => this.setNp('npSegmentField', e.target.value),
+      npModalMapRef: this.npModalMapRef,
+      npLat: this.addPropState.npLat.toFixed(5), npLng: this.addPropState.npLng.toFixed(5),
+      themeLabel: this.state.dark ? 'Modo claro' : 'Modo oscuro',
+      dark: this.state.dark,
+      notDark: !this.state.dark,
+      toggleTheme: () => this.toggleTheme(),
+      mapRef: this.mapRef,
+      selected,
+      closeSelected: () => this.closeSelected(),
+      detail,
+      closeDetail: () => this.closeDetail(),
+      contactOpen: this.state.contactOpen,
+      notContactOpen: !this.state.contactOpen,
+      openContact: () => this.openContact(),
+      closeContact: () => this.closeContact(),
+      contactMessage: detail ? `Hola, me interesa "${detail.title}". ¿Podríamos platicar más detalles?` : '',
+      waLink: detail ? `https://wa.me/${detail.ownerPhone.replace(/[^0-9]/g, '')}` : '',
+      adminWeight: this.state.role === 'admin' ? 800 : 400,
+      asesorWeight: this.state.role === 'asesor' ? 800 : 400,
+      setRoleAdmin: () => this.setRole('admin'),
+      setRoleAsesor: () => this.setRole('asesor'),
+      logout: () => { localStorage.removeItem('ah-token'); localStorage.removeItem('ah-user'); }
+    };
+  }
+}
+</script>
+</body>
+</html>
